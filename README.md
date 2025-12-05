@@ -1,5 +1,5 @@
 # DeviceMaster
-Device manager for notebook/laptop parts in Linux.
+Device manager for computer/laptop parts in Linux.
 
 ## Usage
 DeviceMaster::Apps::JRPC enables a JRPC control over a UNIX socket.
