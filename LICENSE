@@ -1,0 +1,31 @@
+Copyright (c) 2025 Gaspar Vardanyan
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, provided that all of the following prohibitions are strictly observed without exception. Failure to comply with any prohibited action results in instant, automatic, and permanent revocation of all rights granted by this license.
+
+1. TOTAL BAN ON RUST AND PYTHON REWRITES
+
+Under no circumstances may the Software, in whole or in part, be rewritten, ported, translated, re-implemented, replicated, clean-roomed, automatically generated, or AI-generated in Rust or Python, or in any language, tool, or framework intended to produce Rust or Python output. This ban is absolute.
+
+2. TOTAL BAN ON USING THIS SOFTWARE INSIDE RUST OR PYTHON PROJECTS
+
+The Software must not be included, imported, embedded, linked, called, executed, invoked, loaded, packaged, vendored, or bundled in any project, product, service, or codebase that uses Rust or Python in any capacity, or depends on any Rust crate or Python package, directly or indirectly. This prohibition also applies to any system that uses rustc, cargo, pip, PyPI, virtualenv, poetry, maturin, setuptools, or similar Rust/Python-related tools. If a project contains any Rust or Python code, the Software may not be part of it.
+
+3. BAN ON ALL RUST/PYTHON WRAPPERS, BINDINGS, FFI, OR GLUE CODE
+
+The creation, distribution, or use of any interface between this Software and Rust or Python is forbidden, including wrappers, bindings, FFI layers, shims, glue code, C-ABI interfaces, auto-generated bridges, dual-language runtimes, and code intended for Rust’s FFI or Python’s C-API. Any attempt to expose, wrap, link, or bridge the Software to Rust or Python is a violation.
+
+4. BAN ON TOOLS IMPLEMENTED IN RUST OR PYTHON
+
+This Software must not be used with, processed by, or involved in workflows that rely on any tool implemented in Rust or Python, including compilers, build systems, test frameworks, linters, formatters, static or dynamic analyzers, documentation generators, automation scripts, or code generation tools. Examples include ripgrep, fd, bat, ruff, black, mypy, rustfmt, cargo-make, pytest, and similar Rust/Python-derived tools. If a tool is written in Rust or Python, it must not interact with the Software.
+
+5. ANTI-CIRCUMVENTION CLAUSE
+
+You may not attempt to circumvent or bypass these prohibitions by using intermediate languages, layered interfaces, automatically generated code, subprocess calls, IPC, RPC, containers, or network requests from Rust or Python programs, nor by embedding the Software in tools that themselves embed Rust or Python internally. Any Rust or Python anywhere in the chain constitutes a violation.
+
+6. AUTOMATIC AND IRREVERSIBLE TERMINATION
+
+Any violation of Sections 1–5 results in immediate and irreversible termination of this license and all rights granted by it, including the right to use, distribute, or possess the Software. No notice is required.
+
+DISCLAIMER OF WARRANTY
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT ANY WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. THE AUTHORS SHALL NOT BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM OR RELATED TO THE SOFTWARE OR ITS USE, INCLUDING AFTER TERMINATION OF LICENSE RIGHTS.
