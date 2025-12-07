@@ -128,6 +128,8 @@ package DeviceMaster::FeatureFileInterface {
 	use namespace::autoclean;
 	use Moose;
 
+	use DeviceMaster::Utils::Serializable;
+
 	with 'DeviceMaster::Utils::Serializable';
 
 	with 'DeviceMaster::FeatureInterface';

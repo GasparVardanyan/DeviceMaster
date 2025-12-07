@@ -13,6 +13,12 @@ package DeviceMaster::Device {
 		isa => 'HashRef[DeviceMaster::FeatureInterface]',
 		default => sub { {} }
 	);
+	has feature_interfaces_virtual => (
+		is => 'ro',
+		isa => 'HashRef[DeviceMaster::FeatureInterface]',
+		default => sub { {} },
+		lazy => 1
+	);
 	has dir => (
 		is => 'ro',
 		isa => 'Str',
@@ -41,11 +47,11 @@ package DeviceMaster::Device {
 				$self->feature_interfaces->{$feature_name} = $feature->make_interface ($self);
 			}
 		}
+
+		$self->feature_interfaces_virtual;
 	};
 
-	sub BUILD {
-
-	}
+	sub BUILD { }
 
 	sub acquire {
 		my $self = shift;
