@@ -111,7 +111,7 @@ package DeviceMaster::Virtual::FeaturePercentageInterface {
 		init_arg => undef,
 		default => sub {
 			my $self = shift;
-			return $self->target->readable;
+			return ${$self->target}->readable;
 		},
 		lazy => 1
 	);
@@ -119,7 +119,7 @@ package DeviceMaster::Virtual::FeaturePercentageInterface {
 		init_arg => undef,
 		default => sub {
 			my $self = shift;
-			return $self->target->writable
+			return ${$self->target}->writable
 		},
 		lazy => 1
 	);
