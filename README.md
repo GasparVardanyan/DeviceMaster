@@ -166,6 +166,127 @@ Combined to one line (**paste -s -d ''**) will give an output like:
 ]
 ```
 
+### Using Virtual interfaces (percentage and compound wrappers)
+```json
+[
+	{ "type": "Set", "path": "/platform_profiles/platform-profile-0/FI/profile", "value": "performance" },
+	[
+		{ "type": "Set", "path": "/cpu/intel_pstate/FI/status", "value": "active" },
+		{ "type": "Set", "path": "/cpu/intel_pstate/FI/hwp_dynamic_boost", "value": 1 },
+		{ "type": "Set", "path": "/cpu/intel_pstate/FI/no_turbo", "value": 0 },
+		{ "type": "Set", "path": "/cpu/intel_pstate/FI/min_perf_pct", "value": 10 },
+		{ "type": "Set", "path": "/cpu/intel_pstate/FI/max_perf_pct", "value": 100 }
+	],
+	[
+		{ "type": "Set", "path": "/cpu/intel_pstate/FIV/scaling_governor", "value": "powersave" },
+		{ "type": "Set", "path": "/cpu/intel_pstate/FIV/energy_performance_preference", "value": "performance" },
+		{ "type": "Set", "path": "/cpu/intel_pstate/FIV/scaling_min_freq_pct", "value": 0 },
+		{ "type": "Set", "path": "/cpu/intel_pstate/FIV/scaling_max_freq_pct", "value": 100 }
+	],
+	[
+		{ "type": "Set", "path": "/gpu/card1/FIV/gt_min_freq_mhz_pct", "value": 0 },
+		{ "type": "Set", "path": "/gpu/card1/FIV/gt_max_freq_mhz_pct", "value": 100 },
+		{ "type": "Set", "path": "/gpu/card1/FIV/gt_boost_freq_mhz_pct", "value": 100 }
+	],
+	{ "type": "Set", "path": "/backlights/intel_backlight/FIV/brightness_pct", "value": 100 }
+]
+```
+**FIV** is a short for feature_interfaces_virtual.
+This will give an output like:
+```json
+[
+  {
+	"success": 1,
+	"response": "performance"
+  },
+  [
+	{
+	  "success": 1,
+	  "response": "active"
+	},
+	{
+	  "success": 1,
+	  "response": "1"
+	},
+	{
+	  "success": 1,
+	  "response": "0"
+	},
+	{
+	  "success": 1,
+	  "response": "10"
+	},
+	{
+	  "success": 1,
+	  "response": "100"
+	}
+  ],
+  [
+	{
+	  "success": 1,
+	  "response": {
+		"cpufreq_policy1": "powersave",
+		"cpufreq_policy4": "powersave",
+		"cpufreq_policy0": "powersave",
+		"cpufreq_policy2": "powersave",
+		"cpufreq_policy3": "powersave",
+		"cpufreq_policy5": "powersave"
+	  }
+	},
+	{
+	  "success": 1,
+	  "response": {
+		"cpufreq_policy1": "performance",
+		"cpufreq_policy4": "performance",
+		"cpufreq_policy0": "performance",
+		"cpufreq_policy2": "performance",
+		"cpufreq_policy3": "performance",
+		"cpufreq_policy5": "performance"
+	  }
+	},
+	{
+	  "success": 1,
+	  "response": {
+		"cpufreq_policy1": 0,
+		"cpufreq_policy4": 0,
+		"cpufreq_policy0": 0,
+		"cpufreq_policy2": 0,
+		"cpufreq_policy3": 0,
+		"cpufreq_policy5": 0
+	  }
+	},
+	{
+	  "success": 1,
+	  "response": {
+		"cpufreq_policy1": 100,
+		"cpufreq_policy4": 100,
+		"cpufreq_policy0": 100,
+		"cpufreq_policy2": 100,
+		"cpufreq_policy3": 100,
+		"cpufreq_policy5": 100
+	  }
+	}
+  ],
+  [
+	{
+	  "success": 1,
+	  "response": 0
+	},
+	{
+	  "success": 1,
+	  "response": 100
+	},
+	{
+	  "success": 1,
+	  "response": 100
+	}
+  ],
+  {
+	"success": 1,
+	"response": 100
+  }
+]
+```
 ## Supported devices
 Currently I'm working on a Dell Vostro 15 device with 13th gen Intel CPU and without a dGPU. For AMD CPUs, discrete graphics and other devices contributions are wellcome.
 

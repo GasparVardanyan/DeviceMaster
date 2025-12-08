@@ -91,7 +91,7 @@ package DeviceMaster::Virtual::FeaturePercentageInterface {
 
 		$self->_value_read ($t);
 
-		return POSIX::lrint DeviceMaster::Types::MakePercentage (($t - $l) * 100 / ($u - $l));
+		return DeviceMaster::Types::MakePercentage (($t - $l) * 100 / ($u - $l));
 	}
 
 	sub write {
