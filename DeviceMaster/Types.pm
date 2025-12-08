@@ -6,6 +6,7 @@ package DeviceMaster::Types {
 	use Moose::Util::TypeConstraints;
 
 	use List::Util;
+	use POSIX;
 
 	subtype 'DeviceMaster::Types::Percentage'
 		=> as 'Num'
@@ -30,10 +31,8 @@ package DeviceMaster::Types {
 		my $lower = shift;
 		my $upper = shift;
 
-		return int List::Util::min ($upper, List::Util::max ($lower, $real));
+		return List::Util::min ($upper, List::Util::max ($lower, POSIX::lrint $real));
 	}
 }
-
-# package DeviceMaster::Types
 
 1;

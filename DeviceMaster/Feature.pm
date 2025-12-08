@@ -96,8 +96,8 @@ package DeviceMaster::FeatureInterface {
 		traits => ['DoNotSerialize']
 	);
 
-	has readable => ( is => 'ro', isa => 'Bool', required => 1);
-	has writable => ( is => 'ro', isa => 'Bool', required => 1);
+	has readable => ( is => 'ro', isa => 'Bool', required => 1 );
+	has writable => ( is => 'ro', isa => 'Bool', required => 1 );
 
 	sub acquire {
 		my $self = shift;
