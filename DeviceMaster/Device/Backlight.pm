@@ -38,9 +38,7 @@ package DeviceMaster::Device::Backlight {
 				brightness_pct => DeviceMaster::Virtual::FeaturePercentageInterface->new (
 					lower_bound => \$DeviceMaster::Virtual::FeatureConstantInterface::Zero,
 					upper_bound => \$self->feature_interfaces->{max_brightness},
-					target => \$self->feature_interfaces->{brightness},
-					writable => 1,
-					readable => 1
+					target => \$self->feature_interfaces->{brightness}
 				)
 			};
 		}

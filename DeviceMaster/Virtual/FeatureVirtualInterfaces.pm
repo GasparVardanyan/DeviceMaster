@@ -116,6 +116,23 @@ package DeviceMaster::Virtual::FeaturePercentageInterface {
 
 	with 'DeviceMaster::FeatureInterface';
 
+	has '+readable' => (
+		init_arg => undef,
+		default => sub {
+			my $self = shift;
+			return $self->target->readable;
+		},
+		lazy => 1
+	);
+	has '+writable' => (
+		init_arg => undef,
+		default => sub {
+			my $self = shift;
+			return $self->target->writable
+		},
+		lazy => 1
+	);
+
 	has '+value' => (
 		isa => 'DeviceMaster::Types::Percentage'
 	);
@@ -176,6 +193,32 @@ package DeviceMaster::Virtual::FeatureCompoundInterface {
 
 	has '+value' => (
 		isa => 'HashRef[Str]'
+	);
+
+	has '+readable' => (
+		init_arg => undef,
+		default => sub {
+			my $self = shift;
+			my @status_arr = List::Util::uniq map { ${$self->targets->{$_}}->readable } keys %{ $self->targets };
+			if (@status_arr != 1) {
+				die "All features interfaces in the virtual compount interface must possess the same readability state";
+			}
+			return $status_arr[0];
+		},
+		lazy => 1
+	);
+
+	has '+writable' => (
+		init_arg => undef,
+		default => sub {
+			my $self = shift;
+			my @status_arr = List::Util::uniq map { ${$self->targets->{$_}}->writable } keys %{ $self->targets };
+			if (@status_arr != 1) {
+				die "All features interfaces in the virtual compount interface must possess the same writablity state";
+			}
+			return $status_arr[0];
+		},
+		lazy => 1
 	);
 
 	around set => sub {

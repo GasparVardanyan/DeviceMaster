@@ -51,36 +51,28 @@ package DeviceMaster::Device::CPU::IntelPState {
 						map {
 							$_ => \$self->scaling_policies->{$_}->feature_interfaces->{scaling_governor}
 						} keys %{ $self->scaling_policies }
-					},
-					writable => 1,
-					readable => 1
+					}
 				),
 				energy_performance_preference => DeviceMaster::Virtual::FeatureCompoundInterface->new (
 					targets => {
 						map {
 							$_ => \$self->scaling_policies->{$_}->feature_interfaces->{energy_performance_preference}
 						} keys %{ $self->scaling_policies }
-					},
-					writable => 1,
-					readable => 1
+					}
 				),
 				scaling_min_freq_pct => DeviceMaster::Virtual::FeatureCompoundInterface->new (
 					targets => {
 						map {
 							$_ => \$self->scaling_policies->{$_}->feature_interfaces_virtual->{scaling_min_freq_pct}
 						} keys %{ $self->scaling_policies }
-					},
-					writable => 1,
-					readable => 1
+					}
 				),
 				scaling_max_freq_pct => DeviceMaster::Virtual::FeatureCompoundInterface->new (
 					targets => {
 						map {
 							$_ => \$self->scaling_policies->{$_}->feature_interfaces_virtual->{scaling_max_freq_pct}
 						} keys %{ $self->scaling_policies }
-					},
-					writable => 1,
-					readable => 1
+					}
 				),
 			};
 		}
@@ -150,16 +142,12 @@ package DeviceMaster::Device::CPU::IntelPState::CpuFreqPolicy {
 				scaling_min_freq_pct => DeviceMaster::Virtual::FeaturePercentageInterface->new (
 					lower_bound => \$self->feature_interfaces->{cpuinfo_min_freq},
 					upper_bound => \$self->feature_interfaces->{cpuinfo_max_freq},
-					target => \$self->feature_interfaces->{scaling_min_freq},
-					writable => 1,
-					readable => 1,
+					target => \$self->feature_interfaces->{scaling_min_freq}
 				),
 				scaling_max_freq_pct => DeviceMaster::Virtual::FeaturePercentageInterface->new (
 					lower_bound => \$self->feature_interfaces->{cpuinfo_min_freq},
 					upper_bound => \$self->feature_interfaces->{cpuinfo_max_freq},
-					target => \$self->feature_interfaces->{scaling_max_freq},
-					writable => 1,
-					readable => 1,
+					target => \$self->feature_interfaces->{scaling_max_freq}
 				),
 			};
 		}
