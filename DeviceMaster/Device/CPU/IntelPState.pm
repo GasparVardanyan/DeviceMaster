@@ -15,6 +15,9 @@ package DeviceMaster::Device::CPU::IntelPState {
 	use Moose;
 
 	use DeviceMaster::Feature;
+	use DeviceMaster::Virtual::FeatureVirtualInterfaces;
+
+	use List::Util;
 
 	my %_Features = map { $_ => DeviceMaster::FeatureFile->new (
 		name => $_,
@@ -38,6 +41,43 @@ package DeviceMaster::Device::CPU::IntelPState {
 		default => sub { \%_Features }
 	);
 
+	has '+feature_interfaces_virtual' => (
+		default => sub {
+			my $self = shift;
+
+			return {
+				scaling_governor => DeviceMaster::Virtual::FeatureCompoundInterface->new (
+					targets => {
+						map {
+							$_ => \$self->scaling_policies->{$_}->feature_interfaces->{scaling_governor}
+						} keys %{ $self->scaling_policies }
+					}
+				),
+				energy_performance_preference => DeviceMaster::Virtual::FeatureCompoundInterface->new (
+					targets => {
+						map {
+							$_ => \$self->scaling_policies->{$_}->feature_interfaces->{energy_performance_preference}
+						} keys %{ $self->scaling_policies }
+					}
+				),
+				scaling_min_freq_pct => DeviceMaster::Virtual::FeatureCompoundInterface->new (
+					targets => {
+						map {
+							$_ => \$self->scaling_policies->{$_}->feature_interfaces_virtual->{scaling_min_freq_pct}
+						} keys %{ $self->scaling_policies }
+					}
+				),
+				scaling_max_freq_pct => DeviceMaster::Virtual::FeatureCompoundInterface->new (
+					targets => {
+						map {
+							$_ => \$self->scaling_policies->{$_}->feature_interfaces_virtual->{scaling_max_freq_pct}
+						} keys %{ $self->scaling_policies }
+					}
+				),
+			};
+		}
+	);
+
 	has scaling_policies => (
 		is => 'ro',
 		isa => 'HashRef[DeviceMaster::Device::CPU::IntelPState::CpuFreqPolicy]',
@@ -54,7 +94,7 @@ package DeviceMaster::Device::CPU::IntelPState {
 						dir => $_,
 						id => $_ =~ s/^\Q$dir\E//r =~ s/\/$//r =~ s/\//_/r
 					)
-				} glob ($dir . 'cpufreq/policy*/')
+				} List::Util::uniq glob ($dir . 'cpufreq/policy*/')
 			};
 		},
 		lazy => 1
@@ -92,6 +132,25 @@ package DeviceMaster::Device::CPU::IntelPState::CpuFreqPolicy {
 
 	has '+Features' => (
 		default => sub { \%_Features }
+	);
+
+	has '+feature_interfaces_virtual' => (
+		default => sub {
+			my $self = shift;
+
+			return {
+				scaling_min_freq_pct => DeviceMaster::Virtual::FeaturePercentageInterface->new (
+					lower_bound => \$self->feature_interfaces->{cpuinfo_min_freq},
+					upper_bound => \$self->feature_interfaces->{cpuinfo_max_freq},
+					target => \$self->feature_interfaces->{scaling_min_freq}
+				),
+				scaling_max_freq_pct => DeviceMaster::Virtual::FeaturePercentageInterface->new (
+					lower_bound => \$self->feature_interfaces->{cpuinfo_min_freq},
+					upper_bound => \$self->feature_interfaces->{cpuinfo_max_freq},
+					target => \$self->feature_interfaces->{scaling_max_freq}
+				),
+			};
+		}
 	);
 
 	has scaling_available_governors => (

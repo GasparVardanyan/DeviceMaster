@@ -143,7 +143,8 @@ package DeviceMaster::Apps::JRPC {
 		my $cmd = shift;
 
 		my $path = $cmd->path;
-		$path =~ s#/FI/#/feature_interfaces/#g;
+		$path =~ s#/\bFI\b/#/feature_interfaces/#g;
+		$path =~ s#/\bFIV\b/#/feature_interfaces_virtual/#g;
 
 		my $df = $$dsref->dive ($path);
 
@@ -167,7 +168,7 @@ package DeviceMaster::Apps::JRPC {
 					return { response => $$df->acquire, success => 1 };
 				}
 				else {
-					return { response => '', success => 0, error => 'failed to set the value' };
+					return { response => $$df->acquire, success => 0, error => 'failed to set the value' };
 				}
 			}
 			else {

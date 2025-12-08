@@ -7,7 +7,15 @@ package DeviceMaster::Device::GPU::I915 {
 
 	use DeviceMaster::Feature;
 
+	use List::Util;
+
 	my @_FeaturesGlobs = qw (
+		gt_boost_freq_mhz
+		gt_max_freq_mhz
+		gt_min_freq_mhz
+		gt_RP0_freq_mhz
+		gt_RP1_freq_mhz
+		gt_RPn_freq_mhz
 		gt_*_freq_mhz
 	);
 
@@ -25,10 +33,34 @@ package DeviceMaster::Device::GPU::I915 {
 					DeviceMaster::FeatureFile->new (
 						name => File::Basename::basename $_
 					)
-				} map { glob $dir . $_ } @_FeaturesGlobs
+				} List::Util::uniq map { glob $dir . $_ } @_FeaturesGlobs
 			};
 		},
 		lazy => 1
+	);
+
+	has '+feature_interfaces_virtual' => (
+		default => sub {
+			my $self = shift;
+
+			return {
+				gt_min_freq_mhz_pct => DeviceMaster::Virtual::FeaturePercentageInterface->new (
+					lower_bound => \$self->feature_interfaces->{gt_RPn_freq_mhz},
+					upper_bound => \$self->feature_interfaces->{gt_RP0_freq_mhz},
+					target => \$self->feature_interfaces->{gt_min_freq_mhz}
+				),
+				gt_max_freq_mhz_pct => DeviceMaster::Virtual::FeaturePercentageInterface->new (
+					lower_bound => \$self->feature_interfaces->{gt_RPn_freq_mhz},
+					upper_bound => \$self->feature_interfaces->{gt_RP0_freq_mhz},
+					target => \$self->feature_interfaces->{gt_max_freq_mhz}
+				),
+				gt_boost_freq_mhz_pct => DeviceMaster::Virtual::FeaturePercentageInterface->new (
+					lower_bound => \$self->feature_interfaces->{gt_RPn_freq_mhz},
+					upper_bound => \$self->feature_interfaces->{gt_RP0_freq_mhz},
+					target => \$self->feature_interfaces->{gt_boost_freq_mhz}
+				),
+			};
+		}
 	);
 
 	has driver => ( is => 'ro', isa => 'Str', required => 1 );

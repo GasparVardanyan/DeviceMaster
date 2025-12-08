@@ -16,6 +16,7 @@ package DeviceMaster::Device::CPU::IntelRapl {
 	use DeviceMaster::Feature;
 
 	use File::Basename;
+	use List::Util;
 
 	my @_FeaturesGlobs = qw (
 		constraint_*_max_power_uw
@@ -42,7 +43,7 @@ package DeviceMaster::Device::CPU::IntelRapl {
 					DeviceMaster::FeatureFile->new (
 						name => File::Basename::basename $_
 					)
-				} map { glob $dir . $_ } @_FeaturesGlobs
+				} List::Util::uniq map { glob $dir . $_ } @_FeaturesGlobs
 			};
 		},
 		lazy => 1
@@ -64,7 +65,7 @@ package DeviceMaster::Device::CPU::IntelRapl {
 						dir => $_,
 						id => $_ =~ s/^\Q$dir\E//r =~ s/\/$//r
 					)
-				} glob ($dir . 'intel-rapl*/')
+				} List::Util::uniq glob ($dir . 'intel-rapl*/')
 			};
 		},
 		lazy => 1

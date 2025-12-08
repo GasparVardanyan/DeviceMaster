@@ -16,6 +16,7 @@ package DeviceMaster::Device::HwMon {
 	use DeviceMaster::Feature;
 
 	use File::Basename;
+	use List::Util;
 
 	my @_FeaturesGlobs = qw (
 		curr*_input
@@ -57,7 +58,7 @@ package DeviceMaster::Device::HwMon {
 					DeviceMaster::FeatureFile->new (
 						name => File::Basename::basename $_
 					)
-				} map { glob $dir . $_ } @_FeaturesGlobs
+				} List::Util::uniq map { glob $dir . $_ } @_FeaturesGlobs
 			};
 		},
 		lazy => 1
