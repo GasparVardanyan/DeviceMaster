@@ -65,16 +65,9 @@ package DeviceMaster::Virtual::FeaturePercentageInterface {
 		required => 1,
 	);
 
-	has _value_read => (
+	has _write_status => (
 		is => 'rw',
-		isa => 'Int',
-		init_arg => undef,
-		traits => ['DoNotSerialize']
-	);
-
-	has _value_write => (
-		is => 'rw',
-		isa => 'Int',
+		isa => 'Bool',
 		init_arg => undef,
 		traits => ['DoNotSerialize']
 	);
@@ -89,8 +82,6 @@ package DeviceMaster::Virtual::FeaturePercentageInterface {
 		my $l = ${$self->lower_bound}->acquire;
 		my $t = ${$self->target}->acquire;
 
-		$self->_value_read ($t);
-
 		return DeviceMaster::Types::MakePercentage (($t - $l) * 100 / ($u - $l));
 	}
 
@@ -102,16 +93,16 @@ package DeviceMaster::Virtual::FeaturePercentageInterface {
 		my $l = ${$self->lower_bound}->acquire;
 
 		if ($DeviceMaster::Virtual::FeatureConstantInterface::Hundred == $p) {
-			$self->_value_write ($u);
+			$self->_write_status (${$self->target}->set ($u));
 		}
 		elsif ($DeviceMaster::Virtual::FeatureConstantInterface::Zero == $p) {
-			$self->_value_write ($l);
+			$self->_write_status (${$self->target}->set ($l));
 		}
 		else {
-			$self->_value_write (DeviceMaster::Types::BoundInt ($l + ($u - $l) * $p / 100, $l, $u));
+			$self->_write_status (
+				${$self->target}->set (DeviceMaster::Types::BoundInt ($l + ($u - $l) * $p / 100, $l, $u))
+			);
 		}
-
-		${$self->target}->set ($self->_value_write);
 	}
 
 	with 'DeviceMaster::FeatureInterface';
@@ -144,7 +135,7 @@ package DeviceMaster::Virtual::FeaturePercentageInterface {
 
 		$self->$orig ($value);
 
-		return $self->_value_read == $self->_value_write;
+		return $self->_write_status;
 	};
 }
 
