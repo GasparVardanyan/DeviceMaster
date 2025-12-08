@@ -158,6 +158,14 @@ package DeviceMaster::Virtual::FeatureCompoundInterface {
 		required => 1,
 	);
 
+	has _write_status => (
+		is => 'rw',
+		isa => 'HashRef[Bool]',
+		init_arg => undef,
+		traits => ['DoNotSerialize'],
+		default => sub { {} }
+	);
+
 	sub read {
 		my $self = shift;
 
@@ -175,8 +183,7 @@ package DeviceMaster::Virtual::FeatureCompoundInterface {
 		my %_T = %{ $self->targets };
 
 		for my $fname (keys %_T) {
-			my $fref = $_T {$fname};
-			${$fref}->set ($value);
+			$self->_write_status->{$fname} = ${$_T {$fname}}->set ($value);
 		}
 	}
 
@@ -219,7 +226,7 @@ package DeviceMaster::Virtual::FeatureCompoundInterface {
 
 		$self->$orig ($value);
 
-		return List::Util::all { $_ eq $value } values %{ $self->value };
+		return List::Util::all { $_ eq 1 } values %{ $self->_write_status };
 	};
 }
 
