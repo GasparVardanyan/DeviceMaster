@@ -230,4 +230,66 @@ package DeviceMaster::Virtual::FeatureCompoundInterface {
 	};
 }
 
+package DeviceMaster::Virtual::FeatureChoiceInterface {
+	use namespace::autoclean;
+	use Moose;
+
+	use DeviceMaster::FeatureInterface;
+	use DeviceMaster::Utils::Serializable;
+	use DeviceMaster::Types;
+
+	with 'DeviceMaster::Utils::Serializable';
+
+	has choices => (
+		is => 'ro',
+		isa => 'ScalarRef[DeviceMaster::FeatureInterface]',
+		traits => ['DoNotSerialize'],
+		required => 1,
+	);
+
+	has target => (
+		is => 'ro',
+		isa => 'ScalarRef[DeviceMaster::FeatureInterface]',
+		traits => ['DoNotSerialize'],
+		required => 1,
+	);
+
+	sub read {
+		my $self = shift;
+
+		return ${$self->target}->acquire;
+	}
+
+	sub write {
+		my $self = shift;
+		my $value = shift;
+
+		if (grep { $_ eq $value } split ' ', ${$self->choices}->acquire) {
+			return ${$self->target}->set ($value);
+		}
+		else {
+			return 0;
+		}
+	}
+
+	with 'DeviceMaster::FeatureInterface';
+
+	has '+readable' => (
+		init_arg => undef,
+		default => sub {
+			my $self = shift;
+			return ${$self->target}->readable;
+		},
+		lazy => 1
+	);
+	has '+writable' => (
+		init_arg => undef,
+		default => sub {
+			my $self = shift;
+			return ${$self->target}->writable
+		},
+		lazy => 1
+	);
+}
+
 1;
