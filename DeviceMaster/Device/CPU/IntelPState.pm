@@ -49,14 +49,14 @@ package DeviceMaster::Device::CPU::IntelPState {
 				scaling_governor => DeviceMaster::Virtual::FeatureCompoundInterface->new (
 					targets => {
 						map {
-							$_ => \$self->scaling_policies->{$_}->feature_interfaces->{scaling_governor}
+							$_ => \$self->scaling_policies->{$_}->feature_interfaces_virtual->{scaling_governor}
 						} keys %{ $self->scaling_policies }
 					}
 				),
 				energy_performance_preference => DeviceMaster::Virtual::FeatureCompoundInterface->new (
 					targets => {
 						map {
-							$_ => \$self->scaling_policies->{$_}->feature_interfaces->{energy_performance_preference}
+							$_ => \$self->scaling_policies->{$_}->feature_interfaces_virtual->{energy_performance_preference}
 						} keys %{ $self->scaling_policies }
 					}
 				),
@@ -149,57 +149,18 @@ package DeviceMaster::Device::CPU::IntelPState::CpuFreqPolicy {
 					upper_bound => \$self->feature_interfaces->{cpuinfo_max_freq},
 					target => \$self->feature_interfaces->{scaling_max_freq}
 				),
+				scaling_governor => DeviceMaster::Virtual::FeatureChoiceInterface->new (
+					choices => \$self->feature_interfaces->{scaling_available_governors},
+					target => \$self->feature_interfaces->{scaling_governor}
+				),
+				energy_performance_preference => DeviceMaster::Virtual::FeatureChoiceInterface->new (
+					choices => \$self->feature_interfaces->{energy_performance_available_preferences},
+					target => \$self->feature_interfaces->{energy_performance_preference}
+				),
 			};
 		}
 	);
 
-	has scaling_available_governors => (
-		is => 'ro',
-		isa => 'ArrayRef[Str]',
-		traits => ['DoNotSerialize'],
-		default => sub {
-			my $self = shift;
-
-			return [ split ' ', $self->acquire ('scaling_available_governors') ];
-		},
-		lazy => 1
-	);
-
-	has energy_performance_available_preferences => (
-		is => 'ro',
-		isa => 'ArrayRef[Str]',
-		traits => ['DoNotSerialize'],
-		default => sub {
-			my $self = shift;
-
-			return [ split ' ', $self->acquire ('energy_performance_available_preferences') ];
-		},
-		lazy => 1
-	);
-
-	sub BUILD {
-		my $self = shift;
-		$self->scaling_available_governors;
-		$self->energy_performance_available_preferences;
-	}
-
-	sub set_scaling_governor {
-		my $self = shift;
-		my $scaling_governor = shift;
-
-		if (grep { $_ eq $$scaling_governor } @{ $self->scaling_available_governors }) {
-			$self->set ('scaling_governor', $$scaling_governor);
-		}
-	}
-
-	sub set_energy_performance_preference {
-		my $self = shift;
-		my $energy_performance_preference = shift;
-
-		if (grep { $_ eq $energy_performance_preference } @{ $self->energy_performance_available_preferences }) {
-			$self->set ('energy_performance_preference', $energy_performance_preference);
-		}
-	}
 }
 
 1;

@@ -29,31 +29,18 @@ package DeviceMaster::Device::PlatformProfile {
 		default => sub { \%_Features }
 	);
 
-	has choices => (
-		is => 'ro',
-		isa => 'ArrayRef[Str]',
-		traits => ['DoNotSerialize'],
+	has '+feature_interfaces_virtual' => (
 		default => sub {
 			my $self = shift;
 
-			return [ split ' ', $self->acquire ('choices') ];
-		},
-		lazy => 1
-	);
-
-	sub BUILD {
-		my $self = shift;
-		$self->choices;
-	}
-
-	sub set_profile {
-		my $self = shift;
-		my $profile = shift;
-
-		if (grep { $_ eq $profile } @{ $self->choices }) {
-			$self->set ('profile', $profile);
+			return {
+				profile => DeviceMaster::Virtual::FeatureChoiceInterface->new (
+					choices => \$self->feature_interfaces->{choices},
+					target => \$self->feature_interfaces->{profile}
+				)
+			};
 		}
-	}
+	);
 }
 
 1;
