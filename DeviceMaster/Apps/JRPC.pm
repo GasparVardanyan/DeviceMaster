@@ -3,28 +3,28 @@
 use strict;
 use warnings;
 
-package DeviceMaster::Apps::JRPC::Packet {
+package DeviceMaster::AppUtils::JRPC::Packet {
 	use namespace::autoclean;
 	use Moose::Role;
 	use Moose::Util;
 	use Moose::Util::TypeConstraints;
 
-	enum 'DeviceMaster::Apps::JRPC::Packet::Type' => [ 'Get', 'Set' ];
+	enum 'DeviceMaster::AppUtils::JRPC::Packet::Type' => [ 'Get', 'Set' ];
 
 	has type => (
 		is => 'ro',
-		isa => 'DeviceMaster::Apps::JRPC::Packet::Type',
+		isa => 'DeviceMaster::AppUtils::JRPC::Packet::Type',
 		required => 1
 	);
 };
 
-package DeviceMaster::Apps::JRPC::Packet::Get {
+package DeviceMaster::AppUtils::JRPC::Packet::Get {
 	use namespace::autoclean;
 	use Moose;
 
-	use DeviceMaster::Apps::JRPC::Packet;
+	use DeviceMaster::AppUtils::JRPC::Packet;
 
-	with 'DeviceMaster::Apps::JRPC::Packet';
+	with 'DeviceMaster::AppUtils::JRPC::Packet';
 
 	has '+type' => (
 		init_arg => undef,
@@ -38,13 +38,13 @@ package DeviceMaster::Apps::JRPC::Packet::Get {
 	);
 };
 
-package DeviceMaster::Apps::JRPC::Packet::Set {
+package DeviceMaster::AppUtils::JRPC::Packet::Set {
 	use namespace::autoclean;
 	use Moose;
 
-	use DeviceMaster::Apps::JRPC::Packet;
+	use DeviceMaster::AppUtils::JRPC::Packet;
 
-	with 'DeviceMaster::Apps::JRPC::Packet';
+	with 'DeviceMaster::AppUtils::JRPC::Packet';
 
 	has '+type' => (
 		init_arg => undef,
@@ -65,7 +65,7 @@ package DeviceMaster::Apps::JRPC::Packet::Set {
 };
 
 package DeviceMaster::Apps::JRPC {
-	use namespace::autoclean;
+	use MooseX::App::Command;
 	use Moose;
 
 	use IO::Socket::UNIX;
@@ -73,9 +73,26 @@ package DeviceMaster::Apps::JRPC {
 	use Thread::Queue;
 	use JSON::XS;
 
+	use Fcntl qw( :mode );
+
 	use DeviceMaster::DeviceSystem;
 	use DeviceMaster::Device;
 	use DeviceMaster::FeatureInterface;
+
+	use DeviceMaster::Apps;
+	extends 'DeviceMaster::Apps';
+
+	option 'path' => (
+		is => 'ro',
+		isa => 'Str',
+		documentation => 'the socket file path',
+		default => '/tmp/devicemaster.socket'
+	);
+
+	option group => (
+		is => 'ro',
+		documentation => 'group to own the socket file'
+	);
 
 	# TODO: get rid of queues, use shared variables
 
@@ -105,12 +122,6 @@ package DeviceMaster::Apps::JRPC {
 			my $s : shared = 1;
 			return \$s;
 		}
-	);
-
-	has path => (
-		is => 'ro',
-		isa => 'Str',
-		required => 1
 	);
 
 	has server => (
@@ -197,7 +208,7 @@ package DeviceMaster::Apps::JRPC {
 
 				if ('Get' eq $type) {
 					if (exists $j->{path}) {
-						my $packet = DeviceMaster::Apps::JRPC::Packet::Get->new (
+						my $packet = DeviceMaster::AppUtils::JRPC::Packet::Get->new (
 							path => $j->{path}
 						);
 
@@ -209,7 +220,7 @@ package DeviceMaster::Apps::JRPC {
 				}
 				elsif ('Set' eq $type) {
 					if (exists $j->{path} && exists $j->{value}) {
-						my $packet = DeviceMaster::Apps::JRPC::Packet::Set->new (
+						my $packet = DeviceMaster::AppUtils::JRPC::Packet::Set->new (
 							path => $j->{path},
 							value => $j->{value}
 						);
@@ -267,6 +278,25 @@ package DeviceMaster::Apps::JRPC {
 				$self->res_q->enqueue ($self->_process_command (\$deviceSystem, $cmd));
 			}
 		});
+	}
+
+	sub run {
+		my $self = shift;
+
+		if (-S $self->path) {
+			unlink $self->path;
+		}
+
+		$self->server;
+
+		chmod S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP, $self->path;
+
+		if (defined $self->group) {
+			# chgrp group path - the most complicated way possible:
+			chown ((stat ($self->path)) [4], (getgrnam ($self->group)) [2], $self->path);
+		}
+
+		$self->listen;
 	}
 }
 
