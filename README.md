@@ -2,7 +2,7 @@
 Device manager for computer/laptop parts in Linux.
 
 ## Usage
-DeviceMaster::Apps::JRPC enables a JRPC control over a UNIX socket.
+DeviceMaster::Apps::Daemon implements a daemon which takes JSON commands through a UNIX socket.
 ### Get detected device info
 ```json
 { "type": "Get", "path": "/" }

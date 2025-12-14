@@ -3,28 +3,28 @@
 use strict;
 use warnings;
 
-package DeviceMaster::AppUtils::JRPC::Packet {
+package DeviceMaster::AppUtils::Daemon::Packet {
 	use namespace::autoclean;
 	use Moose::Role;
 	use Moose::Util;
 	use Moose::Util::TypeConstraints;
 
-	enum 'DeviceMaster::AppUtils::JRPC::Packet::Type' => [ 'Get', 'Set' ];
+	enum 'DeviceMaster::AppUtils::Daemon::Packet::Type' => [ 'Get', 'Set' ];
 
 	has type => (
 		is => 'ro',
-		isa => 'DeviceMaster::AppUtils::JRPC::Packet::Type',
+		isa => 'DeviceMaster::AppUtils::Daemon::Packet::Type',
 		required => 1
 	);
 };
 
-package DeviceMaster::AppUtils::JRPC::Packet::Get {
+package DeviceMaster::AppUtils::Daemon::Packet::Get {
 	use namespace::autoclean;
 	use Moose;
 
-	use DeviceMaster::AppUtils::JRPC::Packet;
+	use DeviceMaster::AppUtils::Daemon::Packet;
 
-	with 'DeviceMaster::AppUtils::JRPC::Packet';
+	with 'DeviceMaster::AppUtils::Daemon::Packet';
 
 	has '+type' => (
 		init_arg => undef,
@@ -38,13 +38,13 @@ package DeviceMaster::AppUtils::JRPC::Packet::Get {
 	);
 };
 
-package DeviceMaster::AppUtils::JRPC::Packet::Set {
+package DeviceMaster::AppUtils::Daemon::Packet::Set {
 	use namespace::autoclean;
 	use Moose;
 
-	use DeviceMaster::AppUtils::JRPC::Packet;
+	use DeviceMaster::AppUtils::Daemon::Packet;
 
-	with 'DeviceMaster::AppUtils::JRPC::Packet';
+	with 'DeviceMaster::AppUtils::Daemon::Packet';
 
 	has '+type' => (
 		init_arg => undef,
@@ -64,7 +64,7 @@ package DeviceMaster::AppUtils::JRPC::Packet::Set {
 	);
 };
 
-package DeviceMaster::Apps::JRPC {
+package DeviceMaster::Apps::Daemon {
 	use MooseX::App::Command;
 	use Moose;
 
@@ -219,7 +219,7 @@ package DeviceMaster::Apps::JRPC {
 
 				if ('Get' eq $type) {
 					if (exists $j->{path}) {
-						my $packet = DeviceMaster::AppUtils::JRPC::Packet::Get->new (
+						my $packet = DeviceMaster::AppUtils::Daemon::Packet::Get->new (
 							path => $j->{path}
 						);
 
@@ -231,7 +231,7 @@ package DeviceMaster::Apps::JRPC {
 				}
 				elsif ('Set' eq $type) {
 					if (exists $j->{path} && exists $j->{value}) {
-						my $packet = DeviceMaster::AppUtils::JRPC::Packet::Set->new (
+						my $packet = DeviceMaster::AppUtils::Daemon::Packet::Set->new (
 							path => $j->{path},
 							value => $j->{value}
 						);
