@@ -41,11 +41,23 @@ package DeviceMaster::Device::CPU::IntelPState {
 		default => sub { \%_Features }
 	);
 
+	our $FeatureStatusChoice = DeviceMaster::Virtual::FeatureConstantInterface->new (
+		value => join ' ', qw (
+			active
+			passive
+			off
+		)
+	);
+
 	has '+feature_interfaces_virtual' => (
 		default => sub {
 			my $self = shift;
 
 			return {
+				status => DeviceMaster::Virtual::FeatureChoiceInterface->new (
+					choices => \$DeviceMaster::Device::CPU::IntelPState::FeatureStatusChoice,
+					target => \$self->feature_interfaces->{status}
+				),
 				scaling_governor => DeviceMaster::Virtual::FeatureCompoundInterface->new (
 					targets => {
 						map {
@@ -115,6 +127,7 @@ package DeviceMaster::Device::CPU::IntelPState::CpuFreqPolicy {
 	my %_Features = map { $_ => DeviceMaster::FeatureFile->new (
 		name => $_
 	) } qw (
+		affected_cpus
 		base_frequency
 		cpuinfo_avg_freq
 		cpuinfo_max_freq

@@ -159,36 +159,47 @@ package DeviceMaster::Apps::JRPC {
 
 		my $df = $$dsref->dive ($path);
 
+		my $r;
+
 		if ('Get' eq $cmd->type) {
 			if (Moose::Util::does_role ($$df, 'DeviceMaster::FeatureInterface')) {
-				return { response => $$df->acquire, success => 1 };
+				$r = { response => $$df->acquire, success => 1 };
+				if (eval { $$df->isa ('DeviceMaster::Virtual::FeatureChoiceInterface') }) {
+					$r->{choices} = [ split ' ', ${$$df->choices}->acquire ];
+				}
+				elsif (eval { $$df->isa ('DeviceMaster::Virtual::FeaturePercentageInterface') }) {
+					$r->{lower_bound} = ${$$df->lower_bound}->acquire;
+					$r->{upper_bound} = ${$$df->upper_bound}->acquire;
+				}
 			}
 			elsif (
 				   Moose::Util::does_role ($$df, 'DeviceMaster::Device')
 				|| eval { $$df->isa ('DeviceMaster::DeviceSystem') }
 			) {
-				return { response => $$df->pack, success => 1 };
+				$r = { response => $$df->pack, success => 1 };
 			}
 			else {
-				return { response => '', success => 0, error => 'invalid data requested' };
+				$r = { response => '', success => 0, error => 'invalid data requested' };
 			}
 		}
 		elsif ('Set' eq $cmd->type) {
 			if (Moose::Util::does_role ($$df, 'DeviceMaster::FeatureInterface')) {
 				if ($$df->set ($cmd->value)) {
-					return { response => $$df->acquire, success => 1 };
+					$r = { response => $$df->acquire, success => 1 };
 				}
 				else {
-					return { response => $$df->acquire, success => 0, error => 'failed to set the value' };
+					$r = { response => $$df->acquire, success => 0, error => 'failed to set the value' };
 				}
 			}
 			else {
-				return { response => '', success => 0, error => 'invalid feature requested to set a value' };
+				$r = { response => '', success => 0, error => 'invalid feature requested to set a value' };
 			}
 		}
 		else {
-			return { response => '', success => 0, error => 'invalid request type' };
+			$r = { response => '', success => 0, error => 'invalid request type' };
 		}
+
+		return $r;
 	}
 
 	sub _process_json {
