@@ -75,6 +75,8 @@ package DeviceMaster::AppUtils::Daemon::Bridge::Item {
 		DeviceSystem
 		Device
 		FeatureInterface
+		HASH
+		Undef
 	)];
 
 	enum 'DeviceMaster::AppUtils::Daemon::Bridge::Item::FeatureType' => [qw (
@@ -127,33 +129,41 @@ package DeviceMaster::AppUtils::Daemon::Bridge {
 			my $path_short = $path;
 			my $path_orig = $path;
 
-			$path =~ s#/\bFI\b/#/feature_interfaces/#g;
-			$path =~ s#/\bFIV\b/#/feature_interfaces_virtual/#g;
-			$path_short =~ s#/\bfeature_interfaces\b/#/FI/#g;
-			$path_short =~ s#/\bfeature_interfaces_virtual\b/#/FIV/#g;
+			$path =~ s/\bFI\b/feature_interfaces/g;
+			$path =~ s/\bFIV\b/feature_interfaces_virtual/g;
+			$path_short =~ s/\bfeature_interfaces\b/FI/g;
+			$path_short =~ s/\bfeature_interfaces_virtual\b/FIV/g;
 
 			my $ref = $self->deviceSystem->dive ($path);
 			my $type;
 			my $feature_type = 'Unset';
 
-			if (Moose::Util::does_role ($$ref, 'DeviceMaster::FeatureInterface')) {
-				$type = 'FeatureInterface';
+			if (defined $$ref) {
+				if (Moose::Util::does_role ($$ref, 'DeviceMaster::FeatureInterface')) {
+					$type = 'FeatureInterface';
 
-				if (eval { $$ref->isa ('DeviceMaster::Virtual::FeatureChoiceInterface') }) {
-					$feature_type = 'FeatureChoiceInterface';
+					if (eval { $$ref->isa ('DeviceMaster::Virtual::FeatureChoiceInterface') }) {
+						$feature_type = 'FeatureChoiceInterface';
+					}
+					elsif (eval { $$ref->isa ('DeviceMaster::Virtual::FeaturePercentageInterface') }) {
+						$feature_type = 'FeaturePercentageInterface';
+					}
+					else {
+						$feature_type = 'Generic';
+					}
 				}
-				elsif (eval { $$ref->isa ('DeviceMaster::Virtual::FeaturePercentageInterface') }) {
-					$feature_type = 'FeaturePercentageInterface';
+				elsif (Moose::Util::does_role ($$ref, 'DeviceMaster::Device')) {
+					$type = 'Device';
 				}
-				else {
-					$feature_type = 'Generic';
+				elsif (eval { $$ref->isa ('DeviceMaster::DeviceSystem') }) {
+					$type = 'DeviceSystem';
+				}
+				elsif ('HASH' eq ref $$ref) {
+					$type = 'HASH';
 				}
 			}
-			elsif (Moose::Util::does_role ($$ref, 'DeviceMaster::Device')) {
-				$type = 'Device';
-			}
-			elsif ($$ref->isa ('DeviceMaster::DeviceSystem')) {
-				$type = 'DeviceSystem';
+			else {
+				$type = 'Undef';
 			}
 
 			$self->_refs->{$path} = DeviceMaster::AppUtils::Daemon::Bridge::Item->new (
@@ -292,6 +302,15 @@ package DeviceMaster::Apps::Daemon {
 				'DeviceSystem' eq $item->type || 'Device' eq $item->type
 			) {
 				$r = { response => ${$item->ref}->pack, success => 1 };
+			}
+			elsif ('HASH' eq $item->type) {
+				$r = { response => {
+					map {
+						$_ => $self->_process_command (DeviceMaster::AppUtils::Daemon::Packet::Get->new (
+							path => $cmd->path . "/$_"
+						))->{response}
+					} keys %${$item->ref}
+				}, success => 1 };
 			}
 			else {
 				$r = { response => '', success => 0, error => 'invalid data requested' };
