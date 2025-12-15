@@ -64,6 +64,117 @@ package DeviceMaster::AppUtils::Daemon::Packet::Set {
 	);
 };
 
+package DeviceMaster::AppUtils::Daemon::Bridge::Item {
+	use namespace::autoclean;
+	use Moose;
+
+	use Moose::Util;
+	use Moose::Util::TypeConstraints;
+
+	enum 'DeviceMaster::AppUtils::Daemon::Bridge::Item::Type' => [qw (
+		DeviceSystem
+		Device
+		FeatureInterface
+	)];
+
+	enum 'DeviceMaster::AppUtils::Daemon::Bridge::Item::FeatureType' => [qw (
+		Unset
+		Generic
+		FeatureChoiceInterface
+		FeaturePercentageInterface
+	)];
+
+	has ref => (
+		is => 'ro',
+		isa => 'ScalarRef[Any]',
+		required => 1
+	);
+
+	has type => (
+		is => 'ro',
+		isa => 'DeviceMaster::AppUtils::Daemon::Bridge::Item::Type',
+		required => 1
+	);
+
+	has feature_type => (
+		is => 'ro',
+		isa => 'DeviceMaster::AppUtils::Daemon::Bridge::Item::FeatureType',
+		default => 'Unset'
+	);
+};
+
+package DeviceMaster::AppUtils::Daemon::Bridge {
+	use namespace::autoclean;
+	use Moose;
+
+	has 'deviceSystem' => (
+		is => 'ro',
+		isa => 'DeviceMaster::DeviceSystem',
+		required => 1
+	);
+
+	has '_refs' => (
+		is => 'rw',
+		isa => 'HashRef[DeviceMaster::AppUtils::Daemon::Bridge::Item]',
+		default => sub { {} }
+	);
+
+	sub getItem {
+		my $self = shift;
+		my $path = shift;
+
+		if (0 == exists $self->_refs->{$path}) {
+			my $path_short = $path;
+			my $path_orig = $path;
+
+			$path =~ s#/\bFI\b/#/feature_interfaces/#g;
+			$path =~ s#/\bFIV\b/#/feature_interfaces_virtual/#g;
+			$path_short =~ s#/\bfeature_interfaces\b/#/FI/#g;
+			$path_short =~ s#/\bfeature_interfaces_virtual\b/#/FIV/#g;
+
+			my $ref = $self->deviceSystem->dive ($path);
+			my $type;
+			my $feature_type = 'Unset';
+
+			if (Moose::Util::does_role ($$ref, 'DeviceMaster::FeatureInterface')) {
+				$type = 'FeatureInterface';
+
+				if (eval { $$ref->isa ('DeviceMaster::Virtual::FeatureChoiceInterface') }) {
+					$feature_type = 'FeatureChoiceInterface';
+				}
+				elsif (eval { $$ref->isa ('DeviceMaster::Virtual::FeaturePercentageInterface') }) {
+					$feature_type = 'FeaturePercentageInterface';
+				}
+				else {
+					$feature_type = 'Generic';
+				}
+			}
+			elsif (Moose::Util::does_role ($$ref, 'DeviceMaster::Device')) {
+				$type = 'Device';
+			}
+			elsif ($$ref->isa ('DeviceMaster::DeviceSystem')) {
+				$type = 'DeviceSystem';
+			}
+
+			$self->_refs->{$path} = DeviceMaster::AppUtils::Daemon::Bridge::Item->new (
+				ref => $ref,
+				type => $type,
+				feature_type => $feature_type
+			);
+
+			if (0 == exists $self->_refs->{$path_short}) {
+				$self->_refs->{$path_short} = $self->_refs->{$path};
+			}
+
+			if (0 == exists $self->_refs->{$path_orig}) {
+				$self->_refs->{$path_orig} = $self->_refs->{$path};
+			}
+		}
+
+		return $self->_refs->{$path};
+	}
+};
+
 package DeviceMaster::Apps::Daemon {
 	use MooseX::App::Command;
 	use Moose;
@@ -138,6 +249,16 @@ package DeviceMaster::Apps::Daemon {
 		lazy => 1
 	);
 
+	has bridge => (
+		is => 'ro',
+		isa => 'DeviceMaster::AppUtils::Daemon::Bridge',
+		default => sub {
+			return DeviceMaster::AppUtils::Daemon::Bridge->new (
+				deviceSystem => DeviceMaster::DeviceSystem->new
+			);
+		}
+	);
+
 	sub _run_command {
 		my $self = shift;
 		my $cmd = shift;
@@ -150,45 +271,39 @@ package DeviceMaster::Apps::Daemon {
 
 	sub _process_command {
 		my $self = shift;
-		my $dsref = shift;
 		my $cmd = shift;
 
-		my $path = $cmd->path;
-		$path =~ s#/\bFI\b/#/feature_interfaces/#g;
-		$path =~ s#/\bFIV\b/#/feature_interfaces_virtual/#g;
-
-		my $df = $$dsref->dive ($path);
+		my $item = $self->bridge->getItem ($cmd->path);
 
 		my $r;
 
 		if ('Get' eq $cmd->type) {
-			if (Moose::Util::does_role ($$df, 'DeviceMaster::FeatureInterface')) {
-				$r = { response => $$df->acquire, success => 1 };
-				if (eval { $$df->isa ('DeviceMaster::Virtual::FeatureChoiceInterface') }) {
-					$r->{choices} = [ split ' ', ${$$df->choices}->acquire ];
+			if ('FeatureInterface' eq $item->type) {
+				$r = { response => ${$item->ref}->acquire, success => 1 };
+				if ('FeatureChoiceInterface' eq $item->feature_type) {
+					$r->{choices} = [ split ' ', ${${$item->ref}->choices}->acquire ];
 				}
-				elsif (eval { $$df->isa ('DeviceMaster::Virtual::FeaturePercentageInterface') }) {
-					$r->{lower_bound} = ${$$df->lower_bound}->acquire;
-					$r->{upper_bound} = ${$$df->upper_bound}->acquire;
+				elsif ('FeaturePercentageInterface' eq $item->feature_type) {
+					$r->{lower_bound} = ${${$item->ref}->lower_bound}->acquire;
+					$r->{upper_bound} = ${${$item->ref}->upper_bound}->acquire;
 				}
 			}
 			elsif (
-				   Moose::Util::does_role ($$df, 'DeviceMaster::Device')
-				|| eval { $$df->isa ('DeviceMaster::DeviceSystem') }
+				'DeviceSystem' eq $item->type || 'Device' eq $item->type
 			) {
-				$r = { response => $$df->pack, success => 1 };
+				$r = { response => ${$item->ref}->pack, success => 1 };
 			}
 			else {
 				$r = { response => '', success => 0, error => 'invalid data requested' };
 			}
 		}
 		elsif ('Set' eq $cmd->type) {
-			if (Moose::Util::does_role ($$df, 'DeviceMaster::FeatureInterface')) {
-				if ($$df->set ($cmd->value)) {
-					$r = { response => $$df->acquire, success => 1 };
+			if ('FeatureInterface' eq $item->type) {
+				if (${$item->ref}->set ($cmd->value)) {
+					$r = { response => ${$item->ref}->acquire, success => 1 };
 				}
 				else {
-					$r = { response => $$df->acquire, success => 0, error => 'failed to set the value' };
+					$r = { response => ${$item->ref}->acquire, success => 0, error => 'failed to set the value' };
 				}
 			}
 			else {
@@ -284,9 +399,8 @@ package DeviceMaster::Apps::Daemon {
 		my $self = shift;
 
 		threads->create (sub {
-			my $deviceSystem = DeviceMaster::DeviceSystem->new;
 			while (my $cmd = $self->cmd_q->dequeue) {
-				$self->res_q->enqueue ($self->_process_command (\$deviceSystem, $cmd));
+				$self->res_q->enqueue ($self->_process_command ($cmd));
 			}
 		});
 	}
