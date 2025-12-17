@@ -31,6 +31,7 @@ package DeviceMaster::Virtual::FeatureConstantInterface {
 	has '+value' => ( required => 1 );
 
 	our $Zero = DeviceMaster::Virtual::FeatureConstantInterface->new ( value => 0 );
+	our $One = DeviceMaster::Virtual::FeatureConstantInterface->new ( value => 1 );
 	our $Hundred = DeviceMaster::Virtual::FeatureConstantInterface->new ( value => 100 );
 };
 
@@ -289,6 +290,10 @@ package DeviceMaster::Virtual::FeatureChoiceInterface {
 			return ${$self->target}->writable
 		},
 		lazy => 1
+	);
+
+	our $Boolean = DeviceMaster::Virtual::FeatureConstantInterface->new (
+		value => '0 1'
 	);
 }
 
