@@ -2,28 +2,31 @@ use strict;
 use warnings;
 
 package DeviceMaster::Utils {
+	use Fcntl;
+
+	use POSIX qw(sysconf _SC_PAGESIZE);
+
+	my $PAGESIZE = sysconf(_SC_PAGESIZE) || 4096;
+
 	sub read_sys_file {
-		my ($filepath) = @_;
+		my ($path) = @_;
 
-		open (my $fh, '<', $filepath) or return "Error opening file $filepath.";
+		sysopen (my $fh, $path, Fcntl::O_RDONLY) or return undef;
 
-		my $value = <$fh>;
+		my $buf = '';
+		sysread ($fh, $buf, $PAGESIZE);
 		close $fh;
 
-		chomp $value if defined $value;
-
-		return $value;
+		$buf =~ s/\n\z//;
+		return $buf;
 	}
 
 	sub write_sys_file {
-		my ($filepath, $value) = @_;
+		my ($path, $value) = @_;
+		$value //= '';
 
-		$value = '' unless defined $value;
-
-		open (my $fh, '>', $filepath) or return "Error opening file $filepath for writing: $!";
-
-		print $fh "$value\n";
-
+		sysopen (my $fh, $path, Fcntl::O_WRONLY | Fcntl::O_TRUNC) or return undef;
+		syswrite ($fh, "$value\n");
 		close $fh;
 
 		return 1;
