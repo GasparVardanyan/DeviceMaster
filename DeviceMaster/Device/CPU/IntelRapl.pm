@@ -52,6 +52,7 @@ package DeviceMaster::Device::CPU::IntelRapl {
 	has subzones => (
 		is => 'ro',
 		isa => 'HashRef[DeviceMaster::Device::CPU::IntelRapl]',
+		init_arg => undef,
 		default => sub {
 			my $self = shift;
 

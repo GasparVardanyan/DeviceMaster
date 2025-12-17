@@ -26,11 +26,16 @@ package DeviceMaster::DeviceSystem {
 	use DeviceMaster::Device::GPU::I915;
 	use DeviceMaster::Device::HwMon;
 
-	has device_type => ( is => 'ro', isa => 'DeviceType' );
+	has device_type => (
+		is => 'ro',
+		isa => 'DeviceType',
+		init_arg => undef
+	);
 
 	has dmi_id => (
 		is => 'ro',
 		isa => 'DeviceMaster::Device::DmiId',
+		init_arg => undef,
 		default => sub { DeviceMaster::Device::DmiId->new (
 			dir => '/sys/class/dmi/id/',
 			id => 'dmi_id'
@@ -40,31 +45,37 @@ package DeviceMaster::DeviceSystem {
 	has batteries => (
 		is => 'ro',
 		isa => 'HashRef[DeviceMaster::Device::Battery]',
+		init_arg => undef,
 		default => sub { {} }
 	);
 	has backlights => (
 		is => 'ro',
 		isa => 'HashRef[DeviceMaster::Device::Backlight]',
+		init_arg => undef,
 		default => sub { {} }
 	);
 	has platform_profiles => (
 		is => 'ro',
 		isa => 'HashRef[DeviceMaster::Device::PlatformProfile]',
+		init_arg => undef,
 		default => sub { {} }
 	);
 	has cpu => (
 		is => 'ro',
 		isa => 'HashRef[DeviceMaster::Device]',
+		init_arg => undef,
 		default => sub { {} }
 	);
 	has gpu => (
 		is => 'ro',
 		isa => 'HashRef[DeviceMaster::Device]',
+		init_arg => undef,
 		default => sub { {} }
 	);
 	has hwmons => (
 		is => 'ro',
 		isa => 'HashRef[DeviceMaster::Device::HwMon]',
+		init_arg => undef,
 		default => sub { {} }
 	);
 

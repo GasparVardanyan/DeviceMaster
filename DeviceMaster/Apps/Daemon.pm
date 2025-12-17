@@ -118,6 +118,7 @@ package DeviceMaster::AppUtils::Daemon::Bridge {
 	has '_refs' => (
 		is => 'rw',
 		isa => 'HashRef[DeviceMaster::AppUtils::Daemon::Bridge::Item]',
+		init_arg => undef,
 		default => sub { {} }
 	);
 
@@ -247,6 +248,7 @@ package DeviceMaster::Apps::Daemon {
 	has server => (
 		is => 'ro',
 		isa => 'IO::Socket::UNIX',
+		init_arg => undef,
 		default => sub {
 			my $self = shift;
 			return IO::Socket::UNIX->new (
@@ -261,6 +263,7 @@ package DeviceMaster::Apps::Daemon {
 	has bridge => (
 		is => 'ro',
 		isa => 'DeviceMaster::AppUtils::Daemon::Bridge',
+		init_arg => undef,
 		default => sub {
 			return DeviceMaster::AppUtils::Daemon::Bridge->new (
 				deviceSystem => DeviceMaster::DeviceSystem->new
@@ -272,7 +275,7 @@ package DeviceMaster::Apps::Daemon {
 		is => 'rw',
 		isa => 'JSON::XS',
 		init_arg => undef,
-		default => sub { JSON::XS->new->utf8->canonical; }
+		default => sub { JSON::XS->new->utf8->canonical; },
 	);
 
 	sub _run_command {

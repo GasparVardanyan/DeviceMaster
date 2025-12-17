@@ -11,11 +11,13 @@ package DeviceMaster::Device {
 	has feature_interfaces => (
 		is => 'ro',
 		isa => 'HashRef[DeviceMaster::FeatureInterface]',
+		init_arg => undef,
 		default => sub { {} }
 	);
 	has feature_interfaces_virtual => (
 		is => 'ro',
 		isa => 'HashRef[DeviceMaster::FeatureInterface]',
+		init_arg => undef,
 		default => sub { {} },
 		lazy => 1
 	);
@@ -29,8 +31,8 @@ package DeviceMaster::Device {
 	has Features => (
 		is => 'ro',
 		isa => 'HashRef[DeviceMaster::Feature]',
-		required => 1,
-		traits => ['DoNotSerialize']
+		traits => ['DoNotSerialize'],
+		init_arg => undef
 	);
 
 	before BUILD => sub {
