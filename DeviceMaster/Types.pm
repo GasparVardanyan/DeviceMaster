@@ -5,8 +5,8 @@ package DeviceMaster::Types {
 	use namespace::autoclean;
 	use Moose::Util::TypeConstraints;
 
-	use List::Util;
-	use POSIX;
+	use List::Util ();
+	use POSIX ();
 
 	subtype 'DeviceMaster::Types::Percentage'
 		=> as 'Num'

@@ -17,7 +17,7 @@ package DeviceMaster::Device::CPU::IntelPState {
 	use DeviceMaster::Feature;
 	use DeviceMaster::Virtual::FeatureVirtualInterfaces;
 
-	use List::Util;
+	use List::Util ();
 
 	my %_Features = map { $_ => DeviceMaster::FeatureFile->new (
 		name => $_,

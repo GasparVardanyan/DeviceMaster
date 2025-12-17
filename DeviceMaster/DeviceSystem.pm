@@ -8,11 +8,11 @@ package DeviceMaster::DeviceSystem {
 
 	with 'DeviceMaster::Utils::Serializable';
 
-	use Cwd qw(abs_path);
+	use Cwd ();
 
-	use Data::Dumper;
-	use Data::Diver;
-	use File::Basename;
+	use Data::Dumper ();
+	use Data::Diver ();
+	use File::Basename ();
 
 	enum DeviceType => [ 'Alienware', 'Generic' ];
 
@@ -223,7 +223,7 @@ package DeviceMaster::DeviceSystem {
 			if ($card_dir =~ qr/card(\d+)\/?$/) {
 				my $card                         =   'card' . $1;
 				my $card_driver_symlink          =   "$card_dir/device/driver";
-				my $card_driver_path             =   abs_path ($card_driver_symlink);
+				my $card_driver_path             =   Cwd::abs_path ($card_driver_symlink);
 				my ($card_driver_name)           =   $card_driver_path =~ qr#\/([^/]+)\/?$#;
 
 				if ("i915" eq $card_driver_name) {

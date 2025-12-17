@@ -2,11 +2,10 @@ use strict;
 use warnings;
 
 package DeviceMaster::Utils {
-	use Fcntl;
+	use Fcntl ();
+	use POSIX ();
 
-	use POSIX qw(sysconf _SC_PAGESIZE);
-
-	my $PAGESIZE = sysconf(_SC_PAGESIZE) || 4096;
+	my $PAGESIZE = POSIX::sysconf (POSIX::_SC_PAGESIZE) || 4096;
 
 	sub read_sys_file {
 		my ($path) = @_;

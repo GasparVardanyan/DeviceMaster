@@ -189,12 +189,11 @@ package DeviceMaster::Apps::Daemon {
 	use MooseX::App::Command;
 	use Moose;
 
-	use IO::Socket::UNIX;
-	use threads;
-	use Thread::Queue;
-	use JSON::XS;
-
-	use Fcntl qw( :mode );
+	use Fcntl ();
+	use threads ();
+	use Thread::Queue ();
+	use IO::Socket::UNIX ();
+	use JSON::XS ();
 
 	use DeviceMaster::DeviceSystem;
 	use DeviceMaster::Device;
@@ -251,7 +250,7 @@ package DeviceMaster::Apps::Daemon {
 		default => sub {
 			my $self = shift;
 			return IO::Socket::UNIX->new (
-				Type => SOCK_STREAM,
+				Type => IO::Socket::UNIX::SOCK_STREAM,
 				Local => $self->path,
 				Listen => 1
 			);
@@ -267,6 +266,13 @@ package DeviceMaster::Apps::Daemon {
 				deviceSystem => DeviceMaster::DeviceSystem->new
 			);
 		}
+	);
+
+	has json => (
+		is => 'rw',
+		isa => 'JSON::XS',
+		init_arg => undef,
+		default => sub { JSON::XS->new->utf8->canonical; }
 	);
 
 	sub _run_command {
@@ -402,14 +408,15 @@ package DeviceMaster::Apps::Daemon {
 
 	sub listen {
 		my $self = shift;
+		# FIXME: handle concurent connections
 		while (my $conn = $self->server->accept) {
 			while (my $cmd = <$conn>) {
 				my $r = { response => '', success => 0, error => 'invalid json' };
-				my $j = eval { JSON::XS->new->utf8->decode ($cmd) };
+				my $j = eval { $self->json->decode ($cmd) };
 				if (!$@) {
 					$r = $self->_process_json ($j);
 				}
-				$$conn->print (JSON::XS->new->utf8->canonical->encode ($r));
+				$$conn->print ($self->json->encode ($r), "\n");
 			}
 		}
 	}
@@ -433,7 +440,7 @@ package DeviceMaster::Apps::Daemon {
 
 		$self->server;
 
-		chmod S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP, $self->path;
+		chmod Fcntl::S_IRUSR|Fcntl::S_IWUSR|Fcntl::S_IRGRP|Fcntl::S_IWGRP, $self->path;
 
 		if (defined $self->group) {
 			# chgrp group path - the most complicated way possible:

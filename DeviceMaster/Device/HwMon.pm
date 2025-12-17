@@ -15,8 +15,8 @@ package DeviceMaster::Device::HwMon {
 
 	use DeviceMaster::Feature;
 
-	use File::Basename;
-	use List::Util;
+	use File::Basename ();
+	use List::Util ();
 
 	my @_FeaturesGlobs = qw (
 		curr*_input
