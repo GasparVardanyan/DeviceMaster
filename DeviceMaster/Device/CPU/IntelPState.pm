@@ -58,6 +58,14 @@ package DeviceMaster::Device::CPU::IntelPState {
 					choices => \$DeviceMaster::Device::CPU::IntelPState::FeatureStatusChoice,
 					target => \$self->feature_interfaces->{status}
 				),
+				no_turbo => DeviceMaster::Virtual::FeatureChoiceInterface->new (
+					choices => \$DeviceMaster::Virtual::FeatureChoiceInterface::Boolean,
+					target => \$self->feature_interfaces->{no_turbo}
+				),
+				hwp_dynamic_boost => DeviceMaster::Virtual::FeatureChoiceInterface->new (
+					choices => \$DeviceMaster::Virtual::FeatureChoiceInterface::Boolean,
+					target => \$self->feature_interfaces->{hwp_dynamic_boost}
+				),
 				scaling_governor => DeviceMaster::Virtual::FeatureCompoundInterface->new (
 					targets => {
 						map {
