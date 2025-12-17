@@ -93,6 +93,7 @@ package DeviceMaster::Device::CPU::IntelPState {
 	has scaling_policies => (
 		is => 'ro',
 		isa => 'HashRef[DeviceMaster::Device::CPU::IntelPState::CpuFreqPolicy]',
+		init_arg => undef,
 		default => sub {
 			my $self = shift;
 
