@@ -7,7 +7,7 @@ package DeviceMaster::Device::GPU::I915 {
 
 	use DeviceMaster::Feature;
 
-	use List::Util;
+	use List::Util ();
 
 	my @_FeaturesGlobs = qw (
 		gt_boost_freq_mhz

@@ -15,8 +15,8 @@ package DeviceMaster::Device::CPU::IntelRapl {
 
 	use DeviceMaster::Feature;
 
-	use File::Basename;
-	use List::Util;
+	use File::Basename ();
+	use List::Util ();
 
 	my @_FeaturesGlobs = qw (
 		constraint_*_max_power_uw

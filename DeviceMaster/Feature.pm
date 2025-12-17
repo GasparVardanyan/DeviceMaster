@@ -19,7 +19,7 @@ package DeviceMaster::FeatureFile {
 
 	with 'DeviceMaster::Feature';
 
-	use Fcntl ':mode';
+	use Fcntl ();
 
 	has path_func => ( is => 'ro', isa => 'CodeRef' );
 
@@ -28,7 +28,7 @@ package DeviceMaster::FeatureFile {
 		my $device = shift;
 
 		my $mode = (stat ($self->file ($device))) [2];
-		my $user_w = ($mode & S_IWUSR);
+		my $user_w = ($mode & Fcntl::S_IWUSR);
 
 		return 0 != $user_w;
 	}
@@ -38,7 +38,7 @@ package DeviceMaster::FeatureFile {
 		my $device = shift;
 
 		my $mode = (stat ($self->file ($device))) [2];
-		my $user_r = ($mode & S_IRUSR);
+		my $user_r = ($mode & Fcntl::S_IRUSR);
 
 		return 0 != $user_r;
 	}

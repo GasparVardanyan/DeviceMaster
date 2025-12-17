@@ -143,7 +143,7 @@ package DeviceMaster::Virtual::FeatureCompoundInterface {
 	use namespace::autoclean;
 	use Moose;
 
-	use List::Util;
+	use List::Util ();
 
 	use DeviceMaster::FeatureInterface;
 	use DeviceMaster::Utils::Serializable;
