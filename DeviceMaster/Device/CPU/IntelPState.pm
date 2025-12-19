@@ -66,6 +66,16 @@ package DeviceMaster::Device::CPU::IntelPState {
 					choices => \$DeviceMaster::Virtual::FeatureChoiceInterface::Boolean,
 					target => \$self->feature_interfaces->{hwp_dynamic_boost}
 				),
+				max_perf_pct => DeviceMaster::Virtual::FeaturePercentageInterface->new (
+					lower_bound => \$DeviceMaster::Virtual::FeatureConstantInterface::Zero,
+					upper_bound => \$DeviceMaster::Virtual::FeatureConstantInterface::Hundred,
+					target => \$self->feature_interfaces->{max_perf_pct}
+				),
+				min_perf_pct => DeviceMaster::Virtual::FeaturePercentageInterface->new (
+					lower_bound => \$DeviceMaster::Virtual::FeatureConstantInterface::Zero,
+					upper_bound => \$DeviceMaster::Virtual::FeatureConstantInterface::Hundred,
+					target => \$self->feature_interfaces->{min_perf_pct}
+				),
 				scaling_governor => DeviceMaster::Virtual::FeatureCompoundInterface->new (
 					targets => {
 						map {
@@ -182,7 +192,6 @@ package DeviceMaster::Device::CPU::IntelPState::CpuFreqPolicy {
 			};
 		}
 	);
-
 }
 
 1;

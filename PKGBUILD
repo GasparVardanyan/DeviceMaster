@@ -1,5 +1,5 @@
 pkgname=devicemaster
-pkgver=r12.16bfe56
+pkgver=r17.d151ae9
 pkgrel=1
 arch=('x86_64')
 depends=('perl')
