@@ -297,4 +297,37 @@ package DeviceMaster::Virtual::FeatureChoiceInterface {
 	);
 }
 
+package DeviceMaster::Virtual::FeatureVirtual {
+	use namespace::autoclean;
+	use Moose;
+
+	use List::Util;
+
+	use DeviceMaster::Feature;
+	with 'DeviceMaster::Feature';
+
+	has dependencies => ( is => 'ro', isa => 'ArrayRef[Str]', required => 1 );
+	has generate => ( is => 'ro', isa => 'CodeRef', required => 1 );
+	has dependency_resolver => ( is => 'ro', isa => 'CodeRef' );
+
+	sub supports {
+		my $self = shift;
+		my $device = shift;
+
+		if (defined $self->dependency_resolver) {
+			return $self->dependency_resolver->($device, $self);
+		}
+		else {
+			return List::Util::all { exists $device->feature_interfaces->{$_} } @{$self->dependencies};
+		}
+	}
+
+	sub make_interface {
+		my $self = shift;
+		my $device_ref = shift;
+
+		return $self->generate ($device_ref);
+	}
+}
+
 1;

@@ -8,8 +8,6 @@ package DeviceMaster::Feature {
 	has name => ( is => 'ro', isa => 'Str', required => 1 );
 
 	requires 'supports';
-	requires 'writable';
-	requires 'readable';
 	requires 'make_interface';
 }
 
@@ -22,26 +20,6 @@ package DeviceMaster::FeatureFile {
 	use Fcntl ();
 
 	has path_func => ( is => 'ro', isa => 'CodeRef' );
-
-	sub writable {
-		my $self = shift;
-		my $device = shift;
-
-		my $mode = (stat ($self->file ($device))) [2];
-		my $user_w = ($mode & Fcntl::S_IWUSR);
-
-		return 0 != $user_w;
-	}
-
-	sub readable {
-		my $self = shift;
-		my $device = shift;
-
-		my $mode = (stat ($self->file ($device))) [2];
-		my $user_r = ($mode & Fcntl::S_IRUSR);
-
-		return 0 != $user_r;
-	}
 
 	sub supports {
 		my $self = shift;
@@ -66,10 +44,17 @@ package DeviceMaster::FeatureFile {
 		my $self = shift;
 		my $device = shift;
 
+		my $file = $self->file ($device);
+		my $mode = (stat ($file)) [2];
+		my $user_w = ($mode & Fcntl::S_IWUSR);
+		my $user_r = ($mode & Fcntl::S_IRUSR);
+		my $writable = (0 != $user_w);
+		my $readable = (0 != $user_r);
+
 		return DeviceMaster::FeatureFileInterface->new (
-			path => $self->file ($device),
-			readable => $self->readable ($device),
-			writable => $self->writable ($device)
+			path => $file,
+			readable => $readable,
+			writable => $writable
 		);
 	}
 }
