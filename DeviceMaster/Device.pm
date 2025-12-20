@@ -32,7 +32,8 @@ package DeviceMaster::Device {
 		is => 'ro',
 		isa => 'HashRef[DeviceMaster::Feature]',
 		traits => ['DoNotSerialize'],
-		init_arg => undef
+		init_arg => undef,
+		default => sub { {} }
 	);
 
 	before BUILD => sub {

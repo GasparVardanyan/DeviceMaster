@@ -21,6 +21,7 @@ package DeviceMaster::DeviceSystem {
 	use DeviceMaster::Device::Battery;
 	use DeviceMaster::Device::DmiId;
 	use DeviceMaster::Device::PlatformProfile;
+	use DeviceMaster::Device::CPU::CPUFreq;
 	use DeviceMaster::Device::CPU::IntelPState;
 	use DeviceMaster::Device::CPU::IntelRapl;
 	use DeviceMaster::Device::GPU::I915;
@@ -212,9 +213,16 @@ package DeviceMaster::DeviceSystem {
 	sub _initialize_cpu {
 		my $self = shift;
 
+		if (-d '/sys/devices/system/cpu/cpufreq/') {
+			$self->cpu->{'cpufreq'} = DeviceMaster::Device::CPU::CPUFreq->new (
+				dir => '/sys/devices/system/cpu/cpufreq/',
+				id => 'cpufreq'
+			);
+		}
+
 		if (-d '/sys/devices/system/cpu/intel_pstate/') {
 			$self->cpu->{'intel_pstate'} = DeviceMaster::Device::CPU::IntelPState->new (
-				dir => '/sys/devices/system/cpu/',
+				dir => '/sys/devices/system/cpu/intel_pstate/',
 				id => 'intel_pstate'
 			);
 		}

@@ -301,7 +301,7 @@ package DeviceMaster::Virtual::FeatureVirtual {
 	use namespace::autoclean;
 	use Moose;
 
-	use List::Util;
+	use List::Util ();
 
 	use DeviceMaster::Feature;
 	with 'DeviceMaster::Feature';
@@ -318,7 +318,7 @@ package DeviceMaster::Virtual::FeatureVirtual {
 			return $self->dependency_resolver->($device, $self);
 		}
 		else {
-			return List::Util::all { exists $device->feature_interfaces->{$_} } @{$self->dependencies};
+			return List::Util::all { exists $device->feature_interfaces->{$_} } @{ $self->dependencies };
 		}
 	}
 
