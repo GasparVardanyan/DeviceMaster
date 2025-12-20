@@ -36,6 +36,14 @@ package DeviceMaster::Device {
 		default => sub { {} }
 	);
 
+	has FeaturesVirtual => (
+		is => 'ro',
+		isa => 'HashRef[DeviceMaster::Virtual::FeatureVirtual]',
+		traits => ['DoNotSerialize'],
+		init_arg => undef,
+		default => sub { {} }
+	);
+
 	before BUILD => sub {
 		my $self = shift;
 
@@ -51,7 +59,17 @@ package DeviceMaster::Device {
 			}
 		}
 
-		$self->feature_interfaces_virtual;
+		%_F = %{ $self->FeaturesVirtual };
+
+		for my $feature_virtual_name (keys %_F) {
+			my $feature_virtual = $_F {$feature_virtual_name};
+
+			if ($feature_virtual->supports ($self)) {
+				my $feature_name = $feature_virtual->name;
+
+				$self->feature_interfaces_virtual->{$feature_name} = $feature_virtual->make_interface ($self);
+			}
+		}
 	};
 
 	sub BUILD { }

@@ -26,29 +26,38 @@ package DeviceMaster::Device::Battery {
 		charge_control_end_threshold
 	);
 
+
+	my %_FeaturesVirtual = map {
+		my $target = $_;
+
+		my $name = $target . '_pct';
+
+		$name => DeviceMaster::Virtual::FeatureVirtual->new (
+			name => $name,
+			dependencies => [$target],
+			generate => sub {
+				my $device = shift;
+
+				return DeviceMaster::Virtual::FeaturePercentageInterface->new (
+					lower_bound => \$DeviceMaster::Virtual::FeatureConstantInterface::Zero,
+					upper_bound => \$DeviceMaster::Virtual::FeatureConstantInterface::Hundred,
+					target => \$device->feature_interfaces->{$target}
+				);
+			}
+		)
+	} qw (
+		charge_control_start_threshold
+		charge_control_end_threshold
+	);
+
 	with 'DeviceMaster::Device';
 
 	has '+Features' => (
 		default => sub { \%_Features }
 	);
 
-	has '+feature_interfaces_virtual' => (
-		default => sub {
-			my $self = shift;
-
-			return {
-				charge_control_start_threshold_pct => DeviceMaster::Virtual::FeaturePercentageInterface->new (
-					lower_bound => \$DeviceMaster::Virtual::FeatureConstantInterface::Zero,
-					upper_bound => \$DeviceMaster::Virtual::FeatureConstantInterface::Hundred,
-					target => \$self->feature_interfaces->{charge_control_start_threshold}
-				),
-				charge_control_end_threshold_pct => DeviceMaster::Virtual::FeaturePercentageInterface->new (
-					lower_bound => \$DeviceMaster::Virtual::FeatureConstantInterface::Zero,
-					upper_bound => \$DeviceMaster::Virtual::FeatureConstantInterface::Hundred,
-					target => \$self->feature_interfaces->{charge_control_end_threshold}
-				),
-			};
-		}
+	has '+FeaturesVirtual' => (
+		default => sub { \%_FeaturesVirtual }
 	);
 }
 

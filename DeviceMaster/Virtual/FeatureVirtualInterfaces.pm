@@ -324,10 +324,60 @@ package DeviceMaster::Virtual::FeatureVirtual {
 
 	sub make_interface {
 		my $self = shift;
-		my $device_ref = shift;
+		my $device = shift;
 
-		return $self->generate ($device_ref);
+		return $self->generate->($device);
 	}
 }
+
+package DeviceMaster::Virtual::FeatureVirtual::DependencyResolver {
+	sub Dependencies {
+		my $feature = shift;
+		my $where = shift;
+
+		return List::Util::all { exists $where->{$_} } @{ $feature->dependencies };
+	}
+
+	sub DeviceDependencies {
+		my $device = shift;
+		my $feature = shift;
+		my $where = shift;
+
+		return DeviceMaster::Virtual::FeatureVirtual::DependencyResolver::Dependencies (
+			$feature, $device->$where
+		);
+	}
+
+	sub FeatureDependencies {
+		my $device = shift;
+		my $feature = shift;
+
+		return DeviceMaster::Virtual::FeatureVirtual::DependencyResolver::Dependencies (
+			$feature, $device->feature_interfaces
+		);
+	}
+
+	sub VirtualFeatureDependencies {
+		my $device = shift;
+		my $feature = shift;
+
+		return DeviceMaster::Virtual::FeatureVirtual::DependencyResolver::Dependencies (
+			$feature, $device->feature_interfaces_virtual
+		);
+	}
+
+	sub CompoundDependencies {
+		my $device = shift;
+		my $feature = shift;
+		my $compound = shift;
+		my $where = shift;
+
+		return List::Util::all {
+			DeviceMaster::Virtual::FeatureVirtual::DependencyResolver::Dependencies (
+				$feature, $compound->{ $_ }->$where
+			)
+		} keys %{ $compound };
+	}
+};
 
 1;

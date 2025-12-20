@@ -28,10 +28,79 @@ package DeviceMaster::Device::CPU::IntelPState {
 		status
 	);
 
+	my %_FeaturesVirtual = (
+		status => DeviceMaster::Virtual::FeatureVirtual->new (
+			name => 'status',
+			dependencies => ['status'],
+			generate => sub {
+				my $device = shift;
+
+				return DeviceMaster::Virtual::FeatureChoiceInterface->new (
+					choices => \$DeviceMaster::Device::CPU::IntelPState::FeatureStatusChoice,
+					target => \$device->feature_interfaces->{status}
+				);
+			}
+		),
+		no_turbo => DeviceMaster::Virtual::FeatureVirtual->new (
+			name => 'no_turbo',
+			dependencies => ['no_turbo'],
+			generate => sub {
+				my $device = shift;
+
+				return DeviceMaster::Virtual::FeatureChoiceInterface->new (
+					choices => \$DeviceMaster::Virtual::FeatureChoiceInterface::Boolean,
+					target => \$device->feature_interfaces->{no_turbo}
+				);
+			}
+		),
+		hwp_dynamic_boost => DeviceMaster::Virtual::FeatureVirtual->new (
+			name => 'hwp_dynamic_boost',
+			dependencies => ['hwp_dynamic_boost'],
+			generate => sub {
+				my $device = shift;
+
+				return DeviceMaster::Virtual::FeatureChoiceInterface->new (
+					choices => \$DeviceMaster::Virtual::FeatureChoiceInterface::Boolean,
+					target => \$device->feature_interfaces->{hwp_dynamic_boost}
+				);
+			}
+		),
+		max_perf_pct => DeviceMaster::Virtual::FeatureVirtual->new (
+			name => 'max_perf_pct',
+			dependencies => ['max_perf_pct'],
+			generate => sub {
+				my $device = shift;
+
+				return DeviceMaster::Virtual::FeaturePercentageInterface->new (
+					lower_bound => \$DeviceMaster::Virtual::FeatureConstantInterface::Zero,
+					upper_bound => \$DeviceMaster::Virtual::FeatureConstantInterface::Hundred,
+					target => \$device->feature_interfaces->{max_perf_pct}
+				);
+			}
+		),
+		min_perf_pct => DeviceMaster::Virtual::FeatureVirtual->new (
+			name => 'min_perf_pct',
+			dependencies => ['min_perf_pct'],
+			generate => sub {
+				my $device = shift;
+
+				return DeviceMaster::Virtual::FeaturePercentageInterface->new (
+					lower_bound => \$DeviceMaster::Virtual::FeatureConstantInterface::Zero,
+					upper_bound => \$DeviceMaster::Virtual::FeatureConstantInterface::Hundred,
+					target => \$device->feature_interfaces->{min_perf_pct}
+				);
+			}
+		),
+	);
+
 	with 'DeviceMaster::Device';
 
 	has '+Features' => (
 		default => sub { \%_Features }
+	);
+
+	has '+FeaturesVirtual' => (
+		default => sub { \%_FeaturesVirtual }
 	);
 
 	our $FeatureStatusChoice = DeviceMaster::Virtual::FeatureConstantInterface->new (
@@ -40,37 +109,6 @@ package DeviceMaster::Device::CPU::IntelPState {
 			passive
 			off
 		)
-	);
-
-	has '+feature_interfaces_virtual' => (
-		default => sub {
-			my $self = shift;
-
-			return {
-				status => DeviceMaster::Virtual::FeatureChoiceInterface->new (
-					choices => \$DeviceMaster::Device::CPU::IntelPState::FeatureStatusChoice,
-					target => \$self->feature_interfaces->{status}
-				),
-				no_turbo => DeviceMaster::Virtual::FeatureChoiceInterface->new (
-					choices => \$DeviceMaster::Virtual::FeatureChoiceInterface::Boolean,
-					target => \$self->feature_interfaces->{no_turbo}
-				),
-				hwp_dynamic_boost => DeviceMaster::Virtual::FeatureChoiceInterface->new (
-					choices => \$DeviceMaster::Virtual::FeatureChoiceInterface::Boolean,
-					target => \$self->feature_interfaces->{hwp_dynamic_boost}
-				),
-				max_perf_pct => DeviceMaster::Virtual::FeaturePercentageInterface->new (
-					lower_bound => \$DeviceMaster::Virtual::FeatureConstantInterface::Zero,
-					upper_bound => \$DeviceMaster::Virtual::FeatureConstantInterface::Hundred,
-					target => \$self->feature_interfaces->{max_perf_pct}
-				),
-				min_perf_pct => DeviceMaster::Virtual::FeaturePercentageInterface->new (
-					lower_bound => \$DeviceMaster::Virtual::FeatureConstantInterface::Zero,
-					upper_bound => \$DeviceMaster::Virtual::FeatureConstantInterface::Hundred,
-					target => \$self->feature_interfaces->{min_perf_pct}
-				)
-			};
-		}
 	);
 }
 
