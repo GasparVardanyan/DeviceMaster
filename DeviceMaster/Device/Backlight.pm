@@ -24,29 +24,36 @@ package DeviceMaster::Device::Backlight {
 		max_brightness
 	);
 
+	my %_FeaturesVirtual = map {
+		my ($upper_bound, $target) = @{$_};
+
+		my $name = $target . '_pct';
+
+		$name => DeviceMaster::Virtual::FeatureVirtual->new (
+			name => $name,
+			dependencies => [$upper_bound, $target],
+			generate => sub {
+				my $device = shift;
+
+				return DeviceMaster::Virtual::FeaturePercentageInterface->new (
+					lower_bound => \$DeviceMaster::Virtual::FeatureConstantInterface::Zero,
+					upper_bound => \$device->feature_interfaces->{$upper_bound},
+					target => \$device->feature_interfaces->{$target}
+				);
+			}
+		)
+	} (
+		[ 'max_brightness', 'brightness' ],
+		[ 'max_brightness', 'actual_brightness' ]
+	);
 	with 'DeviceMaster::Device';
 
 	has '+Features' => (
 		default => sub { \%_Features }
 	);
 
-	has '+feature_interfaces_virtual' => (
-		default => sub {
-			my $self = shift;
-
-			return {
-				brightness_pct => DeviceMaster::Virtual::FeaturePercentageInterface->new (
-					lower_bound => \$DeviceMaster::Virtual::FeatureConstantInterface::Zero,
-					upper_bound => \$self->feature_interfaces->{max_brightness},
-					target => \$self->feature_interfaces->{brightness}
-				),
-				actual_brightness_pct => DeviceMaster::Virtual::FeaturePercentageInterface->new (
-					lower_bound => \$DeviceMaster::Virtual::FeatureConstantInterface::Zero,
-					upper_bound => \$self->feature_interfaces->{max_brightness},
-					target => \$self->feature_interfaces->{actual_brightness}
-				)
-			};
-		}
+	has '+FeaturesVirtual' => (
+		default => sub { \%_FeaturesVirtual }
 	);
 }
 

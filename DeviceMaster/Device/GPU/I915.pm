@@ -19,6 +19,30 @@ package DeviceMaster::Device::GPU::I915 {
 		gt_*_freq_mhz
 	);
 
+	my %_FeaturesVirtual = map {
+		my ($lower_bound, $upper_bound, $target) = @{$_};
+
+		my $name = $target . '_pct';
+
+		$name => DeviceMaster::Virtual::FeatureVirtual->new (
+			name => $name,
+			dependencies => [$lower_bound, $upper_bound, $target],
+			generate => sub {
+				my $device = shift;
+
+				return DeviceMaster::Virtual::FeaturePercentageInterface->new (
+					lower_bound => \$device->feature_interfaces->{$lower_bound},
+					upper_bound => \$device->feature_interfaces->{$upper_bound},
+					target => \$device->feature_interfaces->{$target}
+				);
+			}
+		)
+	} (
+		[ 'gt_RPn_freq_mhz', 'gt_RP0_freq_mhz', 'gt_min_freq_mhz' ],
+		[ 'gt_RPn_freq_mhz', 'gt_RP0_freq_mhz', 'gt_max_freq_mhz' ],
+		[ 'gt_RPn_freq_mhz', 'gt_RP0_freq_mhz', 'gt_boost_freq_mhz' ]
+	);
+
 	with 'DeviceMaster::Device';
 
 	has '+Features' => (
@@ -39,28 +63,8 @@ package DeviceMaster::Device::GPU::I915 {
 		lazy => 1
 	);
 
-	has '+feature_interfaces_virtual' => (
-		default => sub {
-			my $self = shift;
-
-			return {
-				gt_min_freq_mhz_pct => DeviceMaster::Virtual::FeaturePercentageInterface->new (
-					lower_bound => \$self->feature_interfaces->{gt_RPn_freq_mhz},
-					upper_bound => \$self->feature_interfaces->{gt_RP0_freq_mhz},
-					target => \$self->feature_interfaces->{gt_min_freq_mhz}
-				),
-				gt_max_freq_mhz_pct => DeviceMaster::Virtual::FeaturePercentageInterface->new (
-					lower_bound => \$self->feature_interfaces->{gt_RPn_freq_mhz},
-					upper_bound => \$self->feature_interfaces->{gt_RP0_freq_mhz},
-					target => \$self->feature_interfaces->{gt_max_freq_mhz}
-				),
-				gt_boost_freq_mhz_pct => DeviceMaster::Virtual::FeaturePercentageInterface->new (
-					lower_bound => \$self->feature_interfaces->{gt_RPn_freq_mhz},
-					upper_bound => \$self->feature_interfaces->{gt_RP0_freq_mhz},
-					target => \$self->feature_interfaces->{gt_boost_freq_mhz}
-				),
-			};
-		}
+	has '+FeaturesVirtual' => (
+		default => sub { \%_FeaturesVirtual }
 	);
 
 	has driver => ( is => 'ro', isa => 'Str', required => 1 );

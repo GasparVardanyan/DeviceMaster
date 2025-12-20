@@ -23,23 +23,29 @@ package DeviceMaster::Device::PlatformProfile {
 		choices
 	);
 
+	my %_FeaturesVirtual = (
+		profile => DeviceMaster::Virtual::FeatureVirtual->new (
+			name => 'profile',
+			dependencies => ['choices', 'profile'],
+			generate => sub {
+				my $device = shift;
+
+				return DeviceMaster::Virtual::FeatureChoiceInterface->new (
+					choices => \$device->feature_interfaces->{choices},
+					target => \$device->feature_interfaces->{profile}
+				);
+			}
+		)
+	);
+
 	with 'DeviceMaster::Device';
 
 	has '+Features' => (
 		default => sub { \%_Features }
 	);
 
-	has '+feature_interfaces_virtual' => (
-		default => sub {
-			my $self = shift;
-
-			return {
-				profile => DeviceMaster::Virtual::FeatureChoiceInterface->new (
-					choices => \$self->feature_interfaces->{choices},
-					target => \$self->feature_interfaces->{profile}
-				)
-			};
-		}
+	has '+FeaturesVirtual' => (
+		default => sub { \%_FeaturesVirtual }
 	);
 }
 
