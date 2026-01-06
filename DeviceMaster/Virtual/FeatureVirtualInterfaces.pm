@@ -33,6 +33,8 @@ package DeviceMaster::Virtual::FeatureConstantInterface {
 	our $Zero = DeviceMaster::Virtual::FeatureConstantInterface->new ( value => 0 );
 	our $One = DeviceMaster::Virtual::FeatureConstantInterface->new ( value => 1 );
 	our $Hundred = DeviceMaster::Virtual::FeatureConstantInterface->new ( value => 100 );
+
+	__PACKAGE__->meta->make_immutable;
 };
 
 package DeviceMaster::Virtual::FeaturePercentageInterface {
@@ -138,6 +140,8 @@ package DeviceMaster::Virtual::FeaturePercentageInterface {
 
 		return $self->_write_status;
 	};
+
+	__PACKAGE__->meta->make_immutable;
 }
 
 package DeviceMaster::Virtual::FeatureCompoundInterface {
@@ -229,6 +233,8 @@ package DeviceMaster::Virtual::FeatureCompoundInterface {
 
 		return List::Util::all { $_ eq 1 } values %{ $self->_write_status };
 	};
+
+	__PACKAGE__->meta->make_immutable;
 }
 
 package DeviceMaster::Virtual::FeatureChoiceInterface {
@@ -295,6 +301,8 @@ package DeviceMaster::Virtual::FeatureChoiceInterface {
 	our $Boolean = DeviceMaster::Virtual::FeatureConstantInterface->new (
 		value => '0 1'
 	);
+
+	__PACKAGE__->meta->make_immutable;
 }
 
 package DeviceMaster::Virtual::FeatureVirtual {
@@ -328,6 +336,8 @@ package DeviceMaster::Virtual::FeatureVirtual {
 
 		return $self->generate->($device);
 	}
+
+	__PACKAGE__->meta->make_immutable;
 }
 
 package DeviceMaster::Virtual::FeatureVirtual::DependencyResolver {

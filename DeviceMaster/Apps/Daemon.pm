@@ -36,6 +36,8 @@ package DeviceMaster::AppUtils::Daemon::Packet::Get {
 		isa => 'Str',
 		required => 1
 	);
+
+	__PACKAGE__->meta->make_immutable;
 };
 
 package DeviceMaster::AppUtils::Daemon::Packet::Set {
@@ -62,6 +64,8 @@ package DeviceMaster::AppUtils::Daemon::Packet::Set {
 		isa => 'Str',
 		required => 1
 	);
+
+	__PACKAGE__->meta->make_immutable;
 };
 
 package DeviceMaster::AppUtils::Daemon::Bridge::Item {
@@ -103,6 +107,8 @@ package DeviceMaster::AppUtils::Daemon::Bridge::Item {
 		isa => 'DeviceMaster::AppUtils::Daemon::Bridge::Item::FeatureType',
 		default => 'Unset'
 	);
+
+	__PACKAGE__->meta->make_immutable;
 };
 
 package DeviceMaster::AppUtils::Daemon::Bridge {
@@ -184,6 +190,8 @@ package DeviceMaster::AppUtils::Daemon::Bridge {
 
 		return $self->_refs->{$path};
 	}
+
+	__PACKAGE__->meta->make_immutable;
 };
 
 package DeviceMaster::Apps::Daemon {
@@ -452,6 +460,8 @@ package DeviceMaster::Apps::Daemon {
 
 		$self->listen;
 	}
+
+	__PACKAGE__->meta->make_immutable;
 }
 
 1;

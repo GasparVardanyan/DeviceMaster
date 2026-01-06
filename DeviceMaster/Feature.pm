@@ -57,6 +57,8 @@ package DeviceMaster::FeatureFile {
 			writable => $writable
 		);
 	}
+
+	__PACKAGE__->meta->make_immutable;
 }
 
 package DeviceMaster::FeatureFile::FilePath {
@@ -143,6 +145,8 @@ package DeviceMaster::FeatureFileInterface {
 			$value
 		);
 	}
+
+	__PACKAGE__->meta->make_immutable;
 }
 
 1;

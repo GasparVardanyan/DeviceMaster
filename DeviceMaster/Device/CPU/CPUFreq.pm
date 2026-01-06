@@ -86,6 +86,8 @@ package DeviceMaster::Device::CPU::CPUFreq {
 	};
 
 	sub BUILD { }
+
+	__PACKAGE__->meta->make_immutable;
 }
 
 package DeviceMaster::Device::CPU::CPUFreq::Policy {
@@ -181,6 +183,8 @@ package DeviceMaster::Device::CPU::CPUFreq::Policy {
 	has '+FeaturesVirtual' => (
 		default => sub { \%_FeaturesVirtual }
 	);
+
+	__PACKAGE__->meta->make_immutable;
 }
 
 1;
