@@ -3,7 +3,7 @@ use warnings;
 
 package DeviceMaster::Device::GPU::I915 {
 	use namespace::autoclean;
-	use Moose;
+	use Moo;
 
 	use DeviceMaster::Feature;
 
@@ -67,7 +67,7 @@ package DeviceMaster::Device::GPU::I915 {
 		default => sub { \%_FeaturesVirtual }
 	);
 
-	has driver => ( is => 'ro', isa => 'Str', required => 1 );
+	has driver => ( is => 'ro', isa => Types::Standard::Str, required => 1 );
 
 	__PACKAGE__->meta->make_immutable;
 }

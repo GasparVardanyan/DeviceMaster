@@ -11,7 +11,7 @@ use warnings;
 
 package DeviceMaster::Device::CPU::CPUFreq {
 	use namespace::autoclean;
-	use Moose;
+	use Moo;
 
 	use DeviceMaster::Feature;
 	use DeviceMaster::Virtual::FeatureVirtualInterfaces;
@@ -59,7 +59,7 @@ package DeviceMaster::Device::CPU::CPUFreq {
 
 	has policies => (
 		is => 'ro',
-		isa => 'HashRef[DeviceMaster::Device::CPU::CPUFreq::Policy]',
+		isa => Types::Standard::HashRef[Types::Standard::InstanceOf['DeviceMaster::Device::CPU::CPUFreq::Policy']],
 		init_arg => undef,
 		default => sub {
 			my $self = shift;
@@ -92,7 +92,7 @@ package DeviceMaster::Device::CPU::CPUFreq {
 
 package DeviceMaster::Device::CPU::CPUFreq::Policy {
 	use namespace::autoclean;
-	use Moose;
+	use Moo;
 
 	use DeviceMaster::Feature;
 

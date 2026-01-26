@@ -3,7 +3,7 @@ use warnings;
 
 package DeviceMaster::Virtual::FeatureConstantInterface {
 	use namespace::autoclean;
-	use Moose;
+	use Moo;
 
 	use DeviceMaster::FeatureInterface;
 	use DeviceMaster::Utils::Serializable;
@@ -39,7 +39,8 @@ package DeviceMaster::Virtual::FeatureConstantInterface {
 
 package DeviceMaster::Virtual::FeaturePercentageInterface {
 	use namespace::autoclean;
-	use Moose;
+	use Moo;
+	use Types::Standard ();
 
 	use DeviceMaster::FeatureInterface;
 	use DeviceMaster::Utils::Serializable;
@@ -49,28 +50,28 @@ package DeviceMaster::Virtual::FeaturePercentageInterface {
 
 	has lower_bound => (
 		is => 'ro',
-		isa => 'ScalarRef[DeviceMaster::FeatureInterface]',
+		isa => Types::Standard::ScalarRef[Types::Standard::ConsumerOf['DeviceMaster::FeatureInterface']],
 		traits => ['DoNotSerialize'],
 		required => 1,
 	);
 
 	has upper_bound => (
 		is => 'ro',
-		isa => 'ScalarRef[DeviceMaster::FeatureInterface]',
+		isa => Types::Standard::ScalarRef[Types::Standard::ConsumerOf['DeviceMaster::FeatureInterface']],
 		traits => ['DoNotSerialize'],
 		required => 1,
 	);
 
 	has target => (
 		is => 'ro',
-		isa => 'ScalarRef[DeviceMaster::FeatureInterface]',
+		isa => Types::Standard::ScalarRef[Types::Standard::ConsumerOf['DeviceMaster::FeatureInterface']],
 		traits => ['DoNotSerialize'],
 		required => 1,
 	);
 
 	has _write_status => (
 		is => 'rw',
-		isa => 'Bool',
+		isa => Types::Standard::Bool,
 		init_arg => undef,
 		traits => ['DoNotSerialize']
 	);
@@ -128,7 +129,7 @@ package DeviceMaster::Virtual::FeaturePercentageInterface {
 	);
 
 	has '+value' => (
-		isa => 'DeviceMaster::Types::Percentage'
+		isa => DeviceMaster::Types::Percentage ()
 	);
 
 	around set => sub {
@@ -146,7 +147,9 @@ package DeviceMaster::Virtual::FeaturePercentageInterface {
 
 package DeviceMaster::Virtual::FeatureCompoundInterface {
 	use namespace::autoclean;
-	use Moose;
+	use Moo;
+
+	use Types::Standard;
 
 	use List::Util ();
 
@@ -158,14 +161,15 @@ package DeviceMaster::Virtual::FeatureCompoundInterface {
 
 	has targets => (
 		is => 'ro',
-		isa => 'HashRef[ScalarRef[DeviceMaster::FeatureInterface]]',
+		# isa => 'HashRef[ScalarRef[DeviceMaster::FeatureInterface]]',
+		isa => Types::Standard::HashRef[Types::Standard::ScalarRef[Types::Standard::ConsumerOf['DeviceMaster::FeatureInterface']]],
 		traits => ['DoNotSerialize'],
 		required => 1,
 	);
 
 	has _write_status => (
 		is => 'rw',
-		isa => 'HashRef[Bool]',
+		isa => Types::Standard::HashRef[Types::Standard::Bool],
 		init_arg => undef,
 		traits => ['DoNotSerialize'],
 		default => sub { {} }
@@ -195,7 +199,7 @@ package DeviceMaster::Virtual::FeatureCompoundInterface {
 	with 'DeviceMaster::FeatureInterface';
 
 	has '+value' => (
-		isa => 'HashRef[Str]'
+		isa => Types::Standard::HashRef[Types::Standard::Str]
 	);
 
 	has '+readable' => (
@@ -239,7 +243,7 @@ package DeviceMaster::Virtual::FeatureCompoundInterface {
 
 package DeviceMaster::Virtual::FeatureChoiceInterface {
 	use namespace::autoclean;
-	use Moose;
+	use Moo;
 
 	use DeviceMaster::FeatureInterface;
 	use DeviceMaster::Utils::Serializable;
@@ -249,14 +253,14 @@ package DeviceMaster::Virtual::FeatureChoiceInterface {
 
 	has choices => (
 		is => 'ro',
-		isa => 'ScalarRef[DeviceMaster::FeatureInterface]',
+		isa => Types::Standard::ScalarRef[Types::Standard::ConsumerOf['DeviceMaster::FeatureInterface']],
 		traits => ['DoNotSerialize'],
 		required => 1,
 	);
 
 	has target => (
 		is => 'ro',
-		isa => 'ScalarRef[DeviceMaster::FeatureInterface]',
+		isa => Types::Standard::ScalarRef[Types::Standard::ConsumerOf['DeviceMaster::FeatureInterface']],
 		traits => ['DoNotSerialize'],
 		required => 1,
 	);
@@ -307,16 +311,16 @@ package DeviceMaster::Virtual::FeatureChoiceInterface {
 
 package DeviceMaster::Virtual::FeatureVirtual {
 	use namespace::autoclean;
-	use Moose;
+	use Moo;
 
 	use List::Util ();
 
 	use DeviceMaster::Feature;
 	with 'DeviceMaster::Feature';
 
-	has dependencies => ( is => 'ro', isa => 'ArrayRef[Str]', required => 1 );
-	has generate => ( is => 'ro', isa => 'CodeRef', required => 1 );
-	has dependency_resolver => ( is => 'ro', isa => 'CodeRef' );
+	has dependencies => ( is => 'ro', isa => Types::Standard::ArrayRef[Types::Standard::Str], required => 1 );
+	has generate => ( is => 'ro', isa => Types::Standard::CodeRef, required => 1 );
+	has dependency_resolver => ( is => 'ro', isa => Types::Standard::CodeRef );
 
 	sub supports {
 		my $self = shift;

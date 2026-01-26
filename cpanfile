@@ -1,7 +1,5 @@
-requires 'Moose';
-requires 'MooseX::App';
-requires 'MooseX::Storage';
+requires 'namespace::autoclean';
+requires 'Moo';
+requires 'Type::Tiny';
 requires 'Data::Diver';
 requires 'JSON::XS';
-#requires 'USB::LibUSB';
-#requires 'Mojolicious';

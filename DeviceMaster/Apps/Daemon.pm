@@ -5,22 +5,24 @@ use warnings;
 
 package DeviceMaster::AppUtils::Daemon::Packet {
 	use namespace::autoclean;
-	use Moose::Role;
-	use Moose::Util;
-	use Moose::Util::TypeConstraints;
+	use Moo::Role;
+	# use Moose::Util;
+	# use Moose::Util::TypeConstraints;
 
-	enum 'DeviceMaster::AppUtils::Daemon::Packet::Type' => [ 'Get', 'Set' ];
+	# enum 'DeviceMaster::AppUtils::Daemon::Packet::Type' => [ 'Get', 'Set' ];
 
 	has type => (
 		is => 'ro',
-		isa => 'DeviceMaster::AppUtils::Daemon::Packet::Type',
+		# isa => 'DeviceMaster::AppUtils::Daemon::Packet::Type',
 		required => 1
 	);
 };
 
 package DeviceMaster::AppUtils::Daemon::Packet::Get {
 	use namespace::autoclean;
-	use Moose;
+	use Moo;
+
+	use Types::Standard ();
 
 	use DeviceMaster::AppUtils::Daemon::Packet;
 
@@ -33,7 +35,7 @@ package DeviceMaster::AppUtils::Daemon::Packet::Get {
 
 	has 'path' => (
 		is => 'ro',
-		isa => 'Str',
+		isa => Types::Standard::Str,
 		required => 1
 	);
 
@@ -42,7 +44,9 @@ package DeviceMaster::AppUtils::Daemon::Packet::Get {
 
 package DeviceMaster::AppUtils::Daemon::Packet::Set {
 	use namespace::autoclean;
-	use Moose;
+	use Moo;
+
+	use Types::Standard ();
 
 	use DeviceMaster::AppUtils::Daemon::Packet;
 
@@ -55,13 +59,13 @@ package DeviceMaster::AppUtils::Daemon::Packet::Set {
 
 	has 'path' => (
 		is => 'ro',
-		isa => 'Str',
+		isa => Types::Standard::Str,
 		required => 1
 	);
 
 	has 'value' => (
 		is => 'ro',
-		isa => 'Str',
+		isa => Types::Standard::Str,
 		required => 1
 	);
 
@@ -70,41 +74,43 @@ package DeviceMaster::AppUtils::Daemon::Packet::Set {
 
 package DeviceMaster::AppUtils::Daemon::Bridge::Item {
 	use namespace::autoclean;
-	use Moose;
+	use Moo;
 
-	use Moose::Util;
-	use Moose::Util::TypeConstraints;
+	use Types::Standard ();
 
-	enum 'DeviceMaster::AppUtils::Daemon::Bridge::Item::Type' => [qw (
-		DeviceSystem
-		Device
-		FeatureInterface
-		HASH
-		Undef
-	)];
+	# use Moose::Util;
+	# use Moose::Util::TypeConstraints;
 
-	enum 'DeviceMaster::AppUtils::Daemon::Bridge::Item::FeatureType' => [qw (
-		Unset
-		Generic
-		FeatureChoiceInterface
-		FeaturePercentageInterface
-	)];
+	# enum 'DeviceMaster::AppUtils::Daemon::Bridge::Item::Type' => [qw (
+	# 	DeviceSystem
+	# 	Device
+	# 	FeatureInterface
+	# 	HASH
+	# 	Undef
+	# )];
+	#
+	# enum 'DeviceMaster::AppUtils::Daemon::Bridge::Item::FeatureType' => [qw (
+	# 	Unset
+	# 	Generic
+	# 	FeatureChoiceInterface
+	# 	FeaturePercentageInterface
+	# )];
 
 	has ref => (
 		is => 'ro',
-		isa => 'ScalarRef[Any]',
+		isa => Types::Standard::ScalarRef[Types::Standard::Any],
 		required => 1
 	);
 
 	has type => (
 		is => 'ro',
-		isa => 'DeviceMaster::AppUtils::Daemon::Bridge::Item::Type',
+		# isa => 'DeviceMaster::AppUtils::Daemon::Bridge::Item::Type',
 		required => 1
 	);
 
 	has feature_type => (
 		is => 'ro',
-		isa => 'DeviceMaster::AppUtils::Daemon::Bridge::Item::FeatureType',
+		# isa => 'DeviceMaster::AppUtils::Daemon::Bridge::Item::FeatureType',
 		default => 'Unset'
 	);
 
@@ -113,17 +119,19 @@ package DeviceMaster::AppUtils::Daemon::Bridge::Item {
 
 package DeviceMaster::AppUtils::Daemon::Bridge {
 	use namespace::autoclean;
-	use Moose;
+	use Moo;
+
+	use Types::Standard ();
 
 	has 'deviceSystem' => (
 		is => 'ro',
-		isa => 'DeviceMaster::DeviceSystem',
+		# isa => Types::Standard::ScalarRef[Types::Standard::InstanceOf['DeviceMaster::DeviceSystem']],
 		required => 1
 	);
 
 	has '_refs' => (
 		is => 'rw',
-		isa => 'HashRef[DeviceMaster::AppUtils::Daemon::Bridge::Item]',
+		isa => Types::Standard::HashRef[Types::Standard::InstanceOf['DeviceMaster::AppUtils::Daemon::Bridge::Item']],
 		init_arg => undef,
 		default => sub { {} }
 	);
@@ -146,7 +154,7 @@ package DeviceMaster::AppUtils::Daemon::Bridge {
 			my $feature_type = 'Unset';
 
 			if (defined $$ref) {
-				if (Moose::Util::does_role ($$ref, 'DeviceMaster::FeatureInterface')) {
+				if (eval { $$ref->does ('DeviceMaster::FeatureInterface') }) {
 					$type = 'FeatureInterface';
 
 					if (eval { $$ref->isa ('DeviceMaster::Virtual::FeatureChoiceInterface') }) {
@@ -159,7 +167,7 @@ package DeviceMaster::AppUtils::Daemon::Bridge {
 						$feature_type = 'Generic';
 					}
 				}
-				elsif (Moose::Util::does_role ($$ref, 'DeviceMaster::Device')) {
+				elsif (eval { $$ref->does ('DeviceMaster::Device') }) {
 					$type = 'Device';
 				}
 				elsif (eval { $$ref->isa ('DeviceMaster::DeviceSystem') }) {
@@ -195,8 +203,9 @@ package DeviceMaster::AppUtils::Daemon::Bridge {
 };
 
 package DeviceMaster::Apps::Daemon {
-	use MooseX::App::Command;
-	use Moose;
+	use Moo;
+
+	use Types::Standard ();
 
 	use Fcntl ();
 	use threads ();
@@ -208,26 +217,26 @@ package DeviceMaster::Apps::Daemon {
 	use DeviceMaster::Device;
 	use DeviceMaster::FeatureInterface;
 
-	use DeviceMaster::Apps;
-	extends 'DeviceMaster::Apps';
+	# use DeviceMaster::Apps;
+	# extends 'DeviceMaster::Apps';
 
-	option 'path' => (
+	has 'path' => (
 		is => 'ro',
-		isa => 'Str',
-		documentation => 'the socket file path',
+		isa => Types::Standard::Str,
+		# documentation => 'the socket file path',
 		default => '/tmp/devicemaster.socket'
 	);
 
-	option group => (
+	has group => (
 		is => 'ro',
-		documentation => 'group to own the socket file'
+		# documentation => 'group to own the socket file'
 	);
 
 	# TODO: get rid of queues, use shared variables
 
 	has cmd_q => (
 		is => 'ro',
-		isa => 'Thread::Queue',
+		# isa => Types::Standard::ScalarRef[Types::Standard::InstanceOf['Thread::Queue']],
 		init_arg => undef,
 		default => sub {
 			Thread::Queue->new;
@@ -236,7 +245,7 @@ package DeviceMaster::Apps::Daemon {
 
 	has res_q => (
 		is => 'ro',
-		isa => 'Thread::Queue',
+		# isa => Types::Standard::ScalarRef[Types::Standard::InstanceOf['Thread::Queue']],
 		init_arg => undef,
 		default => sub {
 			Thread::Queue->new;
@@ -245,7 +254,7 @@ package DeviceMaster::Apps::Daemon {
 
 	has lock_q => (
 		is => 'ro',
-		isa => 'ScalarRef[Int]',
+		isa => Types::Standard::ScalarRef[Types::Standard::Int],
 		init_arg => undef,
 		default => sub {
 			my $s : shared = 1;
@@ -255,7 +264,7 @@ package DeviceMaster::Apps::Daemon {
 
 	has server => (
 		is => 'ro',
-		isa => 'IO::Socket::UNIX',
+		# isa => Types::Standard::ScalarRef[Types::Standard::InstanceOf['IO::Socket::UNIX']],
 		init_arg => undef,
 		default => sub {
 			my $self = shift;
@@ -270,7 +279,7 @@ package DeviceMaster::Apps::Daemon {
 
 	has bridge => (
 		is => 'ro',
-		isa => 'DeviceMaster::AppUtils::Daemon::Bridge',
+		# isa => Types::Standard::ScalarRef[Types::Standard::InstanceOf['DeviceMaster::AppUtils::Daemon::Bridge']],
 		init_arg => undef,
 		default => sub {
 			return DeviceMaster::AppUtils::Daemon::Bridge->new (
@@ -281,7 +290,7 @@ package DeviceMaster::Apps::Daemon {
 
 	has json => (
 		is => 'rw',
-		isa => 'JSON::XS',
+		# isa => Types::Standard::ScalarRef[Types::Standard::InstanceOf['JSON::XS']],
 		init_arg => undef,
 		default => sub { JSON::XS->new->utf8->canonical; },
 	);

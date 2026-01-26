@@ -11,7 +11,7 @@ use warnings;
 
 package DeviceMaster::Device::CPU::IntelRapl {
 	use namespace::autoclean;
-	use Moose;
+	use Moo;
 
 	use DeviceMaster::Feature;
 
@@ -51,7 +51,7 @@ package DeviceMaster::Device::CPU::IntelRapl {
 
 	has subzones => (
 		is => 'ro',
-		isa => 'HashRef[DeviceMaster::Device::CPU::IntelRapl]',
+		isa => Types::Standard::HashRef[Types::Standard::InstanceOf['DeviceMaster::Device::CPU::IntelRapl']],
 		init_arg => undef,
 		default => sub {
 			my $self = shift;

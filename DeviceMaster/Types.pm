@@ -3,16 +3,27 @@ use warnings;
 
 package DeviceMaster::Types {
 	use namespace::autoclean;
-	use Moose::Util::TypeConstraints;
+
+	use base 'Type::Library';
+	use Types::Standard ();
+	use Type::Utils ();
 
 	use List::Util ();
 	use POSIX ();
 
-	subtype 'DeviceMaster::Types::Percentage'
-		=> as 'Num'
-		=> where { $_ >= 0 && $_ <= 100 }
-		=> message { 'invalid percentage' }
+	Type::Utils::declare 'Percentage',
+		Type::Utils::as Types::Standard::Num,
+		Type::Utils::where { $_ >= 0 && $_ <= 100 },
+		Type::Utils::message { 'invalid percentage' }
 	;
+
+	# Type::Utils::coerce 'Percentage',
+	# Type::Utils::from Types::Standard::Num,
+	# Type::Utils::via {
+	# 	$_ < 0   ? 0
+	#   : $_ > 100 ? 100
+	#   : $_;
+	# };
 
 	sub MakePercentage {
 		my $p = shift;

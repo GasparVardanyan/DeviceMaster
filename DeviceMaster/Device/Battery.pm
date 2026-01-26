@@ -11,7 +11,7 @@ use warnings;
 
 package DeviceMaster::Device::Battery {
 	use namespace::autoclean;
-	use Moose;
+	use Moo;
 
 	use DeviceMaster::Feature;
 
