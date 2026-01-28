@@ -11,7 +11,7 @@ use warnings;
 
 package DeviceMaster::Device::Backlight {
 	use namespace::autoclean;
-	use Moose;
+	use Moo;
 
 	use DeviceMaster::Feature;
 	use DeviceMaster::Virtual::FeatureVirtualInterfaces;

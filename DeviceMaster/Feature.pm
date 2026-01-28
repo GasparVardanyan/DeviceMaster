@@ -3,9 +3,10 @@ use warnings;
 
 package DeviceMaster::Feature {
 	use namespace::autoclean;
-	use Moose::Role;
+	use Moo::Role;
+	use Types::Standard ();
 
-	has name => ( is => 'ro', isa => 'Str', required => 1 );
+	has name => ( is => 'ro', isa => Types::Standard::Str, required => 1 );
 
 	requires 'supports';
 	requires 'make_interface';
@@ -13,13 +14,13 @@ package DeviceMaster::Feature {
 
 package DeviceMaster::FeatureFile {
 	use namespace::autoclean;
-	use Moose;
+	use Moo;
 
 	with 'DeviceMaster::Feature';
 
 	use Fcntl ();
 
-	has path_func => ( is => 'ro', isa => 'CodeRef' );
+	has path_func => ( is => 'ro', isa => Types::Standard::CodeRef);
 
 	sub supports {
 		my $self = shift;
@@ -72,19 +73,19 @@ package DeviceMaster::FeatureFile::FilePath {
 
 package DeviceMaster::FeatureInterface {
 	use namespace::autoclean;
-	use Moose::Role;
+	use Moo::Role;
 
 	requires 'read';
 	requires 'write';
 
 	has value => (
 		is => 'rw',
-		isa => 'Str',
+		isa => Types::Standard::Str,
 		traits => ['DoNotSerialize']
 	);
 
-	has readable => ( is => 'ro', isa => 'Bool', required => 1 );
-	has writable => ( is => 'ro', isa => 'Bool', required => 1 );
+	has readable => ( is => 'ro', isa => Types::Standard::Bool, required => 1 );
+	has writable => ( is => 'ro', isa => Types::Standard::Bool, required => 1 );
 
 	sub acquire {
 		my $self = shift;
@@ -113,7 +114,7 @@ package DeviceMaster::FeatureInterface {
 
 package DeviceMaster::FeatureFileInterface {
 	use namespace::autoclean;
-	use Moose;
+	use Moo;
 
 	use DeviceMaster::Utils::Serializable;
 
@@ -125,7 +126,7 @@ package DeviceMaster::FeatureFileInterface {
 
 	has path => (
 		is => 'ro',
-		isa => 'Str',
+		isa => Types::Standard::Str,
 		traits => ['DoNotSerialize'],
 		required => 1
 	);

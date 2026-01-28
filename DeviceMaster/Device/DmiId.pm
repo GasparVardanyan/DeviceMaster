@@ -3,7 +3,7 @@ use warnings;
 
 package DeviceMaster::Device::DmiId {
 	use namespace::autoclean;
-	use Moose;
+	use Moo;
 
 	use DeviceMaster::Feature;
 
