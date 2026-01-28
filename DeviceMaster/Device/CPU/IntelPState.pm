@@ -110,6 +110,8 @@ package DeviceMaster::Device::CPU::IntelPState {
 			off
 		)
 	);
+
+	__PACKAGE__->meta->make_immutable;
 }
 
 1;

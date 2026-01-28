@@ -28,6 +28,8 @@ package DeviceMaster::Device::DmiId {
 	has '+Features' => (
 		default => sub { \%_Features }
 	);
+
+	__PACKAGE__->meta->make_immutable;
 }
 
 1;

@@ -47,6 +47,8 @@ package DeviceMaster::Device::PlatformProfile {
 	has '+FeaturesVirtual' => (
 		default => sub { \%_FeaturesVirtual }
 	);
+
+	__PACKAGE__->meta->make_immutable;
 }
 
 1;

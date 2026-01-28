@@ -59,6 +59,8 @@ package DeviceMaster::Device::Battery {
 	has '+FeaturesVirtual' => (
 		default => sub { \%_FeaturesVirtual }
 	);
+
+	__PACKAGE__->meta->make_immutable;
 }
 
 1;

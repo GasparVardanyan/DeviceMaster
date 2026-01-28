@@ -77,6 +77,8 @@ package DeviceMaster::Device::CPU::IntelRapl {
 
 		$self->subzones;
 	}
+
+	__PACKAGE__->meta->make_immutable;
 }
 
 1;
