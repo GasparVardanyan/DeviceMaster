@@ -20,7 +20,7 @@ package DeviceMaster::Apps::Daemon {
 
 	has json_processor => (
 		is => 'ro',
-		# isa => Types::Standard::ScalarRef[Types::Standard::InstanceOf['DeviceMaster::AppUtils::PathBridge']],
+		isa => Types::Standard::InstanceOf['DeviceMaster::AppUtils::JSONProcessor'],
 		default => sub {
 			return DeviceMaster::AppUtils::JSONProcessor->new;
 		}

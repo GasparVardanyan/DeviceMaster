@@ -35,7 +35,7 @@ package DeviceMaster::DeviceSystem {
 
 	has dmi_id => (
 		is => 'ro',
-		# isa => Types::Standard::ScalarRef[Types::Standard::InstanceOf['DeviceMaster::Device::DmiId']],
+		isa => Types::Standard::InstanceOf['DeviceMaster::Device::DmiId'],
 		init_arg => undef,
 		default => sub { DeviceMaster::Device::DmiId->new (
 			dir => '/sys/class/dmi/id/',

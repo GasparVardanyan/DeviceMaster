@@ -9,7 +9,7 @@ package DeviceMaster::AppUtils::PacketProcessor {
 
 	has path_bridge => (
 		is => 'ro',
-		# isa => Types::Standard::ScalarRef[Types::Standard::InstanceOf['DeviceMaster::AppUtils::PathBridge']],
+		isa => Types::Standard::InstanceOf['DeviceMaster::AppUtils::PathBridge'],
 		default => sub {
 			return DeviceMaster::AppUtils::PathBridge->new (
 				deviceSystem => DeviceMaster::DeviceSystem->new

@@ -161,7 +161,6 @@ package DeviceMaster::Virtual::FeatureCompoundInterface {
 
 	has targets => (
 		is => 'ro',
-		# isa => 'HashRef[ScalarRef[DeviceMaster::FeatureInterface]]',
 		isa => Types::Standard::HashRef[Types::Standard::ScalarRef[Types::Standard::ConsumerOf['DeviceMaster::FeatureInterface']]],
 		traits => ['DoNotSerialize'],
 		required => 1,

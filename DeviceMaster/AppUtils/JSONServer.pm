@@ -29,7 +29,7 @@ package DeviceMaster::AppUtils::JSONServer {
 
 	has server => (
 		is => 'ro',
-		# isa => Types::Standard::ScalarRef[Types::Standard::InstanceOf['IO::Socket::UNIX']],
+		isa => Types::Standard::InstanceOf['IO::Socket::UNIX'],
 		init_arg => undef,
 		default => sub {
 			my $self = shift;
@@ -44,14 +44,14 @@ package DeviceMaster::AppUtils::JSONServer {
 
 	has json => (
 		is => 'rw',
-		# isa => Types::Standard::ScalarRef[Types::Standard::InstanceOf['JSON::XS']],
+		isa => Types::Standard::InstanceOf['JSON::XS'],
 		init_arg => undef,
 		default => sub { JSON::XS->new->utf8->canonical; }
 	);
 
 	has command_q => (
 		is => 'ro',
-		# isa => Types::Standard::ScalarRef[Types::Standard::InstanceOf['Thread::Queue']],
+		isa => Types::Standard::InstanceOf['Thread::Queue'],
 		init_arg => undef,
 		default => sub {
 			Thread::Queue->new;
