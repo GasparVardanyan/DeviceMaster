@@ -4,9 +4,9 @@ use warnings;
 package DeviceMaster::Utils::Serializable {
 	use namespace::autoclean;
 	use Moo::Role;
-	use Moo::Role::ToJSON;
+	# use Moo::Role::ToJSON;
 
-	with 'Moo::Role::ToJSON';
+	# with 'Moo::Role::ToJSON';
 
 	# use MooseX::Storage;
 	#
