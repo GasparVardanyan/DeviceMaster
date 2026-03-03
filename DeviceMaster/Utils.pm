@@ -32,13 +32,4 @@ package DeviceMaster::Utils {
 	}
 }
 
-package DeviceMaster::Utils::Serializable {
-	use namespace::autoclean;
-	use Moo::Role;
-
-	# use MooseX::Storage;
-	#
-	# with Storage ( 'format' => 'JSON' );
-}
-
 1;
