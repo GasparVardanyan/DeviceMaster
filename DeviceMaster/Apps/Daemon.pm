@@ -33,7 +33,7 @@ package DeviceMaster::AppUtils::Daemon::Packet::Get {
 		default => sub { 'Get' }
 	);
 
-	has 'path' => (
+	has path => (
 		is => 'ro',
 		isa => Types::Standard::Str,
 		required => 1
@@ -57,13 +57,13 @@ package DeviceMaster::AppUtils::Daemon::Packet::Set {
 		default => sub { 'Set' }
 	);
 
-	has 'path' => (
+	has path => (
 		is => 'ro',
 		isa => Types::Standard::Str,
 		required => 1
 	);
 
-	has 'value' => (
+	has value => (
 		is => 'ro',
 		isa => Types::Standard::Str,
 		required => 1
@@ -123,13 +123,13 @@ package DeviceMaster::AppUtils::Daemon::Bridge {
 
 	use Types::Standard ();
 
-	has 'deviceSystem' => (
+	has deviceSystem => (
 		is => 'ro',
 		# isa => Types::Standard::ScalarRef[Types::Standard::InstanceOf['DeviceMaster::DeviceSystem']],
 		required => 1
 	);
 
-	has '_refs' => (
+	has _refs => (
 		is => 'rw',
 		isa => Types::Standard::HashRef[Types::Standard::InstanceOf['DeviceMaster::AppUtils::Daemon::Bridge::Item']],
 		init_arg => undef,
@@ -202,8 +202,9 @@ package DeviceMaster::AppUtils::Daemon::Bridge {
 	__PACKAGE__->meta->make_immutable;
 };
 
-package DeviceMaster::Apps::Daemon {
-	use Moo;
+package DeviceMaster::Apps::JSONDaemon {
+	use namespace::autoclean;
+	use Moo::Role;
 
 	use Types::Standard ();
 
@@ -213,14 +214,9 @@ package DeviceMaster::Apps::Daemon {
 	use IO::Socket::UNIX ();
 	use JSON::XS ();
 
-	use DeviceMaster::DeviceSystem;
-	use DeviceMaster::Device;
-	use DeviceMaster::FeatureInterface;
+	requires 'process_command';
 
-	# use DeviceMaster::Apps;
-	# extends 'DeviceMaster::Apps';
-
-	has 'path' => (
+	has path => (
 		is => 'ro',
 		isa => Types::Standard::Str,
 		# documentation => 'the socket file path',
@@ -232,36 +228,6 @@ package DeviceMaster::Apps::Daemon {
 		# documentation => 'group to own the socket file'
 	);
 
-	# TODO: get rid of queues, use shared variables
-
-	has cmd_q => (
-		is => 'ro',
-		# isa => Types::Standard::ScalarRef[Types::Standard::InstanceOf['Thread::Queue']],
-		init_arg => undef,
-		default => sub {
-			Thread::Queue->new;
-		}
-	);
-
-	has res_q => (
-		is => 'ro',
-		# isa => Types::Standard::ScalarRef[Types::Standard::InstanceOf['Thread::Queue']],
-		init_arg => undef,
-		default => sub {
-			Thread::Queue->new;
-		}
-	);
-
-	has lock_q => (
-		is => 'ro',
-		isa => Types::Standard::ScalarRef[Types::Standard::Int],
-		init_arg => undef,
-		default => sub {
-			my $s : shared = 1;
-			return \$s;
-		}
-	);
-
 	has server => (
 		is => 'ro',
 		# isa => Types::Standard::ScalarRef[Types::Standard::InstanceOf['IO::Socket::UNIX']],
@@ -271,11 +237,102 @@ package DeviceMaster::Apps::Daemon {
 			return IO::Socket::UNIX->new (
 				Type => IO::Socket::UNIX::SOCK_STREAM,
 				Local => $self->path,
-				Listen => 1
+				Listen => 5
 			);
 		},
 		lazy => 1
 	);
+
+	has json => (
+		is => 'rw',
+		# isa => Types::Standard::ScalarRef[Types::Standard::InstanceOf['JSON::XS']],
+		init_arg => undef,
+		default => sub { JSON::XS->new->utf8->canonical; }
+	);
+
+	has command_q => (
+		is => 'ro',
+		# isa => Types::Standard::ScalarRef[Types::Standard::InstanceOf['Thread::Queue']],
+		init_arg => undef,
+		default => sub {
+			Thread::Queue->new;
+		}
+	);
+
+	sub listen {
+		my $self = shift;
+		while (my $client = $self->server->accept) {
+			threads->create (sub {
+				my $result_q = Thread::Queue->new;
+
+				while (my $cmd = <$client>) {
+					chomp $cmd;
+					last unless defined $cmd;
+
+					my $r = { response => '', success => 0, error => 'invalid json' };
+					my $j = eval { $self->json->decode ($cmd) };
+					if (!$@) {
+						$self->command_q->enqueue ([ $result_q, $j ]);
+						$r = $result_q->dequeue;
+					}
+
+					$client->print ($self->json->encode ($r), "\n");
+				}
+
+				$client->close;
+			})->detach;
+		}
+	}
+
+	sub BUILD {
+		my $self = shift;
+
+		threads->create (sub {
+			while (1) {
+				my $task = $self->command_q->dequeue;
+				my ($client_q, $cmd) = @$task;
+
+				my $result = $self->process_command ($cmd);
+
+				$client_q->enqueue ($result);
+			}
+		});
+	}
+
+	sub run {
+		my $self = shift;
+
+		if (-S $self->path) {
+			unlink $self->path;
+		}
+
+		$self->server;
+
+		chmod Fcntl::S_IRUSR|Fcntl::S_IWUSR|Fcntl::S_IRGRP|Fcntl::S_IWGRP, $self->path;
+
+		if (defined $self->group) {
+			# chgrp group path - the most complicated way possible:
+			chown ((stat ($self->path)) [4], (getgrnam ($self->group)) [2], $self->path);
+		}
+
+		$self->listen;
+	}
+
+	__PACKAGE__->meta->make_immutable;
+}
+
+package DeviceMaster::Apps::Daemon {
+	use namespace::autoclean;
+	use Moo;
+
+	use DeviceMaster::Apps::JSONDaemon;
+	with 'DeviceMaster::Apps::JSONDaemon';
+
+	use Types::Standard ();
+
+	use DeviceMaster::DeviceSystem;
+	use DeviceMaster::Device;
+	use DeviceMaster::FeatureInterface;
 
 	has bridge => (
 		is => 'ro',
@@ -288,21 +345,75 @@ package DeviceMaster::Apps::Daemon {
 		}
 	);
 
-	has json => (
-		is => 'rw',
-		# isa => Types::Standard::ScalarRef[Types::Standard::InstanceOf['JSON::XS']],
-		init_arg => undef,
-		default => sub { JSON::XS->new->utf8->canonical; },
-	);
-
-	sub _run_command {
+	sub process_command {
 		my $self = shift;
 		my $cmd = shift;
 
-		lock ${$self->lock_q};
+		return $self->_process_json ($cmd);
+	}
 
-		$self->cmd_q->enqueue ($cmd);
-		return $self->res_q->dequeue;
+	sub _process_json {
+		my $self = shift;
+		my $j = shift;
+
+		my $r;
+
+		if (ref $j eq 'HASH') {
+			$r = {
+				success => 0,
+				response => ''
+			};
+
+			if (exists $j->{type}) {
+				my $type = $j->{type};
+
+				if ('Get' eq $type) {
+					if (exists $j->{path}) {
+						my $packet = DeviceMaster::AppUtils::Daemon::Packet::Get->new (
+							path => $j->{path}
+						);
+
+						$r = $self->_process_command ($packet);
+					}
+					else {
+						$r->{error} = 'Get request must have a path';
+					}
+				}
+				elsif ('Set' eq $type) {
+					if (exists $j->{path} && exists $j->{value}) {
+						my $packet = DeviceMaster::AppUtils::Daemon::Packet::Set->new (
+							path => $j->{path},
+							value => $j->{value}
+						);
+
+						$r = $self->_process_command ($packet);
+					}
+					else {
+						$r->{error} = 'Set request must have path and value';
+					}
+				}
+				else {
+					$r->{error} = 'unsupported type of a command';
+				}
+			}
+			else {
+				$r->{error} = 'request must have a type';
+			}
+
+			return $r;
+		}
+		elsif (ref $j eq 'ARRAY') {
+			$r = [
+				map {
+					$self->_process_json ($_)
+				} @$j
+			];
+
+			return $r;
+		}
+		else {
+			return { response => '', success => 0, error => 'invalid json signature' };
+		}
 	}
 
 	sub _process_command {
@@ -360,114 +471,6 @@ package DeviceMaster::Apps::Daemon {
 		}
 
 		return $r;
-	}
-
-	sub _process_json {
-		my $self = shift;
-		my $j = shift;
-
-		my $r;
-
-		if (ref $j eq 'HASH') {
-			$r = {
-				success => 0,
-				response => ''
-			};
-
-			if (exists $j->{type}) {
-				my $type = $j->{type};
-
-				if ('Get' eq $type) {
-					if (exists $j->{path}) {
-						my $packet = DeviceMaster::AppUtils::Daemon::Packet::Get->new (
-							path => $j->{path}
-						);
-
-						$r = $self->_run_command ($packet);
-					}
-					else {
-						$r->{error} = 'Get request must have a path';
-					}
-				}
-				elsif ('Set' eq $type) {
-					if (exists $j->{path} && exists $j->{value}) {
-						my $packet = DeviceMaster::AppUtils::Daemon::Packet::Set->new (
-							path => $j->{path},
-							value => $j->{value}
-						);
-
-						$r = $self->_run_command ($packet);
-					}
-					else {
-						$r->{error} = 'Set request must have path and value';
-					}
-				}
-				else {
-					$r->{error} = 'unsupported type of a command';
-				}
-			}
-			else {
-				$r->{error} = 'request must have a type';
-			}
-
-			return $r;
-		}
-		elsif (ref $j eq 'ARRAY') {
-			$r = [
-				map {
-					$self->_process_json ($_)
-				} @$j
-			];
-
-			return $r;
-		}
-		else {
-			return { response => '', success => 0, error => 'invalid json signature' };
-		}
-	}
-
-	sub listen {
-		my $self = shift;
-		# FIXME: handle concurent connections
-		while (my $conn = $self->server->accept) {
-			while (my $cmd = <$conn>) {
-				my $r = { response => '', success => 0, error => 'invalid json' };
-				my $j = eval { $self->json->decode ($cmd) };
-				if (!$@) {
-					$r = $self->_process_json ($j);
-				}
-				$$conn->print ($self->json->encode ($r), "\n");
-			}
-		}
-	}
-
-	sub BUILD {
-		my $self = shift;
-
-		threads->create (sub {
-			while (my $cmd = $self->cmd_q->dequeue) {
-				$self->res_q->enqueue ($self->_process_command ($cmd));
-			}
-		});
-	}
-
-	sub run {
-		my $self = shift;
-
-		if (-S $self->path) {
-			unlink $self->path;
-		}
-
-		$self->server;
-
-		chmod Fcntl::S_IRUSR|Fcntl::S_IWUSR|Fcntl::S_IRGRP|Fcntl::S_IWGRP, $self->path;
-
-		if (defined $self->group) {
-			# chgrp group path - the most complicated way possible:
-			chown ((stat ($self->path)) [4], (getgrnam ($self->group)) [2], $self->path);
-		}
-
-		$self->listen;
 	}
 
 	__PACKAGE__->meta->make_immutable;
