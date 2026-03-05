@@ -13,8 +13,9 @@ package DeviceMaster::Device::CPU::IntelPState {
 	use namespace::autoclean;
 	use Moo;
 
+	use DeviceMaster::Device;
 	use DeviceMaster::Feature;
-	use DeviceMaster::Virtual::FeatureVirtualInterfaces;
+	use DeviceMaster::Virtual::FeatureVirtual;
 
 	use List::Util ();
 

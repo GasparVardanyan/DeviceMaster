@@ -5,6 +5,8 @@ package DeviceMaster::AppUtils::PacketProcessor {
 	use namespace::autoclean;
 	use Moo;
 
+	use DeviceMaster::DeviceSystem;
+	use DeviceMaster::AppUtils::Packet;
 	use DeviceMaster::AppUtils::PathBridge;
 
 	has path_bridge => (
@@ -39,7 +41,7 @@ package DeviceMaster::AppUtils::PacketProcessor {
 			elsif (
 				'DeviceSystem' eq $item->type || 'Device' eq $item->type
 			) {
-				$r = { response => ${$item->ref}->pack, success => 1 };
+				$r = { response => ${$item->ref}->TO_JSON, success => 1 };
 			}
 			elsif ('HASH' eq $item->type) {
 				$r = { response => {

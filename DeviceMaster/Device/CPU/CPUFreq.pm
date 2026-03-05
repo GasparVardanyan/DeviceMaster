@@ -13,8 +13,12 @@ package DeviceMaster::Device::CPU::CPUFreq {
 	use namespace::autoclean;
 	use Moo;
 
+	use DeviceMaster::Device;
 	use DeviceMaster::Feature;
-	use DeviceMaster::Virtual::FeatureVirtualInterfaces;
+	use DeviceMaster::Virtual::FeatureVirtual;
+	use DeviceMaster::Virtual::FeatureCompoundInterface;
+	use DeviceMaster::Virtual::FeaturePercentageInterface;
+	use DeviceMaster::Virtual::FeatureChoiceInterface;
 
 	use List::Util ();
 
@@ -52,6 +56,13 @@ package DeviceMaster::Device::CPU::CPUFreq {
 	);
 
 	with 'DeviceMaster::Device';
+
+	around _serializable_attributes => sub {
+		my ($orig, $self) = @_;
+		my $attrs = $self->$orig;
+		unshift @$attrs, "policies";
+		return $attrs;
+	};
 
 	has '+FeaturesVirtual' => (
 		default => sub { \%_FeaturesVirtual }

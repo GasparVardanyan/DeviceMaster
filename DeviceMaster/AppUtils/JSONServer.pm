@@ -46,7 +46,7 @@ package DeviceMaster::AppUtils::JSONServer {
 		is => 'rw',
 		isa => Types::Standard::InstanceOf['JSON::XS'],
 		init_arg => undef,
-		default => sub { JSON::XS->new->utf8->canonical; }
+		default => sub { JSON::XS->new->utf8->canonical->convert_blessed; }
 	);
 
 	has command_q => (
@@ -68,14 +68,18 @@ package DeviceMaster::AppUtils::JSONServer {
 					chomp $cmd;
 					last unless defined $cmd;
 
-					my $r = { response => '', success => 0, error => 'invalid json' };
+					my $r;
+
 					my $j = eval { $self->json->decode ($cmd) };
 					if (!$@) {
 						$self->command_q->enqueue ([ $result_q, $j ]);
 						$r = $result_q->dequeue;
 					}
+					else {
+						$r = $self->json->encode ({ response => '', success => 0, error => 'invalid json' });
+					}
 
-					$client->print ($self->json->encode ($r), "\n");
+					$client->print ($r, "\n");
 				}
 
 				$client->close;
@@ -93,7 +97,7 @@ package DeviceMaster::AppUtils::JSONServer {
 
 				my $result = $self->process_command ($cmd);
 
-				$client_q->enqueue ($result);
+				$client_q->enqueue ($self->json->encode ($result));
 			}
 		});
 	}
