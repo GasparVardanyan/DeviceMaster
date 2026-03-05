@@ -6,7 +6,7 @@ package DeviceMaster::DeviceSystem {
 	use Moo;
 	# use Moose::Util::TypeConstraints;
 
-	with 'DeviceMaster::Utils::Serializable';
+	use DeviceMaster::Utils::Serializable;
 
 	use Cwd ();
 
@@ -35,7 +35,7 @@ package DeviceMaster::DeviceSystem {
 
 	has dmi_id => (
 		is => 'ro',
-		# isa => Types::Standard::ScalarRef[Types::Standard::InstanceOf['DeviceMaster::Device::DmiId']],
+		isa => Types::Standard::InstanceOf['DeviceMaster::Device::DmiId'],
 		init_arg => undef,
 		default => sub { DeviceMaster::Device::DmiId->new (
 			dir => '/sys/class/dmi/id/',
@@ -80,6 +80,17 @@ package DeviceMaster::DeviceSystem {
 		default => sub { {} }
 	);
 
+	sub _serializable_attributes { [qw(
+		dmi_id
+		batteries
+		backlights
+		platform_profiles
+		cpu
+		gpu
+		hwmons
+	)]; }
+	with 'DeviceMaster::Utils::Serializable';
+
 	sub BUILD {
 		my $self = shift;
 
@@ -105,93 +116,6 @@ package DeviceMaster::DeviceSystem {
 		}
 		else {
 			return undef;
-		}
-	}
-
-	sub print_info {
-		my $self = shift;
-
-		# print Dumper( $self->pack ), "\n";
-		# $self->store ("state.json");
-
-		print "dmi_id\n";
-		print "id: " . $self->dmi_id->id . "\n";
-		$self->print_device_info ($self->dmi_id);
-
-		print "\n" . "-" x 30 . "\n\n";
-
-		print "batteries\n";
-		for my $device (values %{ $self->batteries }) {
-			print "id: " . $device->id . "\n";
-			$self->print_device_info ($device);
-		}
-
-		print "\n" . "-" x 30 . "\n\n";
-
-		print "backlights\n";
-		for my $device (values %{ $self->backlights }) {
-			print "id: " . $device->id . "\n";
-			$self->print_device_info ($device);
-		}
-
-		print "\n" . "-" x 30 . "\n\n";
-
-		print "platform_profiles\n";
-		for my $device (values %{ $self->platform_profiles }) {
-			print "id: " . $device->id . "\n";
-			$self->print_device_info ($device);
-		}
-
-		print "\n" . "-" x 30 . "\n\n";
-
-		print "cpu\n";
-		for my $device (values %{ $self->cpu }) {
-			print "id: " . $device->id . "\n";
-			$self->print_device_info ($device);
-			if ($device->isa ('DeviceMaster::Device::CPU::IntelPState')) {
-				for my $sp (values %{ $device->scaling_policies }) {
-					print "\n" . "-" x 30 . "\n\n";
-
-					print "cpu scaling policy: " . $sp->id . "\n";
-					$self->print_device_info ($sp);
-				}
-			}
-		}
-
-		print "\n" . "-" x 30 . "\n\n";
-
-		for my $device (values %{ $self->gpu }) {
-			print "id: " . $device->id . "\n";
-			$self->print_device_info ($device);
-		}
-	}
-
-	sub print_device_info {
-		my $self = shift;
-		my $device = shift;
-
-		my %_F = %{$device->Features};
-
-		for my $feature (sort keys %_F) {
-			if ($device->supports ($feature)) {
-				my $rw;
-				if ($device->readable ($feature)) {
-					$rw = "R";
-				}
-				if ($device->writable ($feature)) {
-					$rw = "${rw}W";
-				}
-				if (1 == length ($rw)) {
-					$rw = "${rw}O";
-				}
-
-				my $value = $device->acquire ($feature);
-
-				print "feature: [$rw] ${feature} = $value\n";
-			}
-			else {
-				print "unsupported feature: $feature\n";
-			}
 		}
 	}
 
