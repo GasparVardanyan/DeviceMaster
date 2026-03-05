@@ -11,7 +11,7 @@ optdepends=(
 )
 makedepends=('perl' 'perl-par-packer' 'cpanminus' 'perl-local-lib')
 options=('!strip')
-source=('devicemaster::git+https://github.com/GasparVardanyan/DeviceMaster#branch=moo')
+source=('devicemaster::git+https://github.com/GasparVardanyan/DeviceMaster')
 sha256sums=('SKIP')
 
 pkgver() {
