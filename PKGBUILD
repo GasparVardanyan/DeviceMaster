@@ -1,11 +1,17 @@
 pkgname=devicemaster
-pkgver=r17.d151ae9
+pkgver=r25.21831d8
 pkgrel=1
 arch=('x86_64')
 depends=('perl')
+optdepends=(
+	'perl-namespace-autoclean: use system perl-namespace-autoclean'
+	'perl-moo: use system perl-moo'
+	'perl-type-tiny: use system perl-type-tiny'
+	'perl-json-xs: use system perl-json-xs'
+)
 makedepends=('perl' 'perl-par-packer' 'cpanminus' 'perl-local-lib')
 options=('!strip')
-source=('devicemaster::git+https://github.com/GasparVardanyan/DeviceMaster')
+source=('devicemaster::git+https://github.com/GasparVardanyan/DeviceMaster#branch=moo')
 sha256sums=('SKIP')
 
 pkgver() {
@@ -37,8 +43,6 @@ build() {
 		-A vendor \
 		-a vendor/lib/perl5 \
 		-a vendor/lib/perl5/x86_64-linux-thread-multi \
-		-M MooseX::Storage::Basic \
-		-M MooseX::Storage::Format::JSON \
 		-o DM DeviceMaster.pl
 }
 

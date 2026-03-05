@@ -73,6 +73,10 @@ package DeviceMaster::AppUtils::PacketProcessor {
 			$r = { response => '', success => 0, error => 'invalid request type' };
 		}
 
+		if (1 == $cmd->return_path) {
+			$r->{path} = $cmd->path;
+		}
+
 		return $r;
 	}
 
