@@ -26,7 +26,8 @@ package DeviceMaster::Apps::Daemon {
 		my $self = shift;
 		my $cmd = shift;
 
-		return $self->json_processor->process ($cmd);
+		my $j = $self->json_processor->process ($cmd);
+		return $j;
 	}
 
 	__PACKAGE__->meta->make_immutable;

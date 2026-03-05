@@ -32,6 +32,13 @@ package DeviceMaster::Device::CPU::IntelRapl {
 
 	with 'DeviceMaster::Device';
 
+	around _serializable_attributes => sub {
+		my ($orig, $self) = @_;
+		my $attrs = $self->$orig;
+		unshift @$attrs, "subzones";
+		return $attrs;
+	};
+
 	has '+Features' => (
 		default => sub {
 			my $self = shift;

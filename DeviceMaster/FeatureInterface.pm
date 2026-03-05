@@ -6,7 +6,7 @@ package DeviceMaster::FeatureInterface {
 	use Moo::Role;
 
 	use DeviceMaster::Utils::Serializable;
-	sub _serializable_attributes { []; }
+	sub _serializable_attributes { ['readable', 'writable']; }
 	with 'DeviceMaster::Utils::Serializable';
 
 	requires 'read';

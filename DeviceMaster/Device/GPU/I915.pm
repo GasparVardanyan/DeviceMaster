@@ -7,8 +7,11 @@ package DeviceMaster::Device::GPU::I915 {
 
 	use DeviceMaster::Device;
 	use DeviceMaster::Feature;
+	use DeviceMaster::FeatureFile;
+	use DeviceMaster::Virtual::FeaturePercentageInterface;
 
 	use List::Util ();
+	use File::Basename ();
 
 	my @_FeaturesGlobs = qw (
 		gt_boost_freq_mhz
@@ -45,6 +48,13 @@ package DeviceMaster::Device::GPU::I915 {
 	);
 
 	with 'DeviceMaster::Device';
+
+	around _serializable_attributes => sub {
+		my ($orig, $self) = @_;
+		my $attrs = $self->$orig;
+		unshift @$attrs, "driver";
+		return $attrs;
+	};
 
 	has '+Features' => (
 		default => sub {

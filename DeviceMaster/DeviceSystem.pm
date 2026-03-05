@@ -80,7 +80,15 @@ package DeviceMaster::DeviceSystem {
 		default => sub { {} }
 	);
 
-	sub _serializable_attributes { []; }
+	sub _serializable_attributes { [qw(
+		dmi_id
+		batteries
+		backlights
+		platform_profiles
+		cpu
+		gpu
+		hwmons
+	)]; }
 	with 'DeviceMaster::Utils::Serializable';
 
 	sub BUILD {
