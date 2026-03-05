@@ -3,11 +3,15 @@ use warnings;
 
 package DeviceMaster::Device::GPU::I915 {
 	use namespace::autoclean;
-	use Moose;
+	use Moo;
 
+	use DeviceMaster::Device;
 	use DeviceMaster::Feature;
+	use DeviceMaster::FeatureFile;
+	use DeviceMaster::Virtual::FeaturePercentageInterface;
 
 	use List::Util ();
+	use File::Basename ();
 
 	my @_FeaturesGlobs = qw (
 		gt_boost_freq_mhz
@@ -45,6 +49,13 @@ package DeviceMaster::Device::GPU::I915 {
 
 	with 'DeviceMaster::Device';
 
+	around _serializable_attributes => sub {
+		my ($orig, $self) = @_;
+		my $attrs = $self->$orig;
+		push @$attrs, "driver";
+		return $attrs;
+	};
+
 	has '+Features' => (
 		default => sub {
 			my $self = shift;
@@ -67,7 +78,7 @@ package DeviceMaster::Device::GPU::I915 {
 		default => sub { \%_FeaturesVirtual }
 	);
 
-	has driver => ( is => 'ro', isa => 'Str', required => 1 );
+	has driver => ( is => 'ro', isa => Types::Standard::Str, required => 1 );
 
 	__PACKAGE__->meta->make_immutable;
 }

@@ -3,43 +3,45 @@ use warnings;
 
 package DeviceMaster::Device {
 	use namespace::autoclean;
-	use Moose::Role;
+	use Moo::Role;
 
+	use DeviceMaster::Feature;
+	use DeviceMaster::Virtual::FeatureVirtual;
+
+	use DeviceMaster::Utils::Serializable;
+	sub _serializable_attributes { ['id', 'feature_interfaces', 'feature_interfaces_virtual']; }
 	with 'DeviceMaster::Utils::Serializable';
 
-	has id => ( is => 'ro', isa => 'Str' );
+	has id => ( is => 'ro', isa => Types::Standard::Str );
 	has feature_interfaces => (
 		is => 'ro',
-		isa => 'HashRef[DeviceMaster::FeatureInterface]',
+		isa => Types::Standard::HashRef[Types::Standard::ConsumerOf['DeviceMaster::FeatureInterface']],
 		init_arg => undef,
 		default => sub { {} }
 	);
 	has feature_interfaces_virtual => (
 		is => 'ro',
-		isa => 'HashRef[DeviceMaster::FeatureInterface]',
+		isa => Types::Standard::HashRef[Types::Standard::ConsumerOf['DeviceMaster::FeatureInterface']],
 		init_arg => undef,
 		default => sub { {} },
 		lazy => 1
 	);
 	has dir => (
 		is => 'ro',
-		isa => 'Str',
+		isa => Types::Standard::Str,
 		default => '',
-		traits => ['DoNotSerialize']
 	);
 
 	has Features => (
 		is => 'ro',
-		isa => 'HashRef[DeviceMaster::Feature]',
-		traits => ['DoNotSerialize'],
+		isa => Types::Standard::HashRef[Types::Standard::ConsumerOf['DeviceMaster::Feature']],
 		init_arg => undef,
 		default => sub { {} }
 	);
 
 	has FeaturesVirtual => (
 		is => 'ro',
-		isa => 'HashRef[DeviceMaster::Virtual::FeatureVirtual]',
-		traits => ['DoNotSerialize'],
+		isa => Types::Standard::HashRef[Types::Standard::ConsumerOf['DeviceMaster::Virtual::FeatureVirtual']],
 		init_arg => undef,
 		default => sub { {} }
 	);

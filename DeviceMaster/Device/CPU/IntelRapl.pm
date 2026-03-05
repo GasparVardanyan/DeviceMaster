@@ -11,8 +11,9 @@ use warnings;
 
 package DeviceMaster::Device::CPU::IntelRapl {
 	use namespace::autoclean;
-	use Moose;
+	use Moo;
 
+	use DeviceMaster::Device;
 	use DeviceMaster::Feature;
 
 	use File::Basename ();
@@ -30,6 +31,13 @@ package DeviceMaster::Device::CPU::IntelRapl {
 	);
 
 	with 'DeviceMaster::Device';
+
+	around _serializable_attributes => sub {
+		my ($orig, $self) = @_;
+		my $attrs = $self->$orig;
+		push @$attrs, "subzones";
+		return $attrs;
+	};
 
 	has '+Features' => (
 		default => sub {
@@ -51,7 +59,7 @@ package DeviceMaster::Device::CPU::IntelRapl {
 
 	has subzones => (
 		is => 'ro',
-		isa => 'HashRef[DeviceMaster::Device::CPU::IntelRapl]',
+		isa => Types::Standard::HashRef[Types::Standard::InstanceOf['DeviceMaster::Device::CPU::IntelRapl']],
 		init_arg => undef,
 		default => sub {
 			my $self = shift;

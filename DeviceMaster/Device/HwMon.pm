@@ -11,8 +11,9 @@ use warnings;
 
 package DeviceMaster::Device::HwMon {
 	use namespace::autoclean;
-	use Moose;
+	use Moo;
 
+	use DeviceMaster::Device;
 	use DeviceMaster::Feature;
 
 	use File::Basename ();

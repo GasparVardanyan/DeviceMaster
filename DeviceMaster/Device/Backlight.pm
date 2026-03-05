@@ -11,10 +11,11 @@ use warnings;
 
 package DeviceMaster::Device::Backlight {
 	use namespace::autoclean;
-	use Moose;
+	use Moo;
 
-	use DeviceMaster::Feature;
-	use DeviceMaster::Virtual::FeatureVirtualInterfaces;
+	use DeviceMaster::Device;
+	use DeviceMaster::FeatureFile;
+	use DeviceMaster::Virtual::FeatureVirtual;
 
 	my %_Features = map { $_ => DeviceMaster::FeatureFile->new (
 		name => $_
@@ -46,6 +47,7 @@ package DeviceMaster::Device::Backlight {
 		[ 'max_brightness', 'brightness' ],
 		[ 'max_brightness', 'actual_brightness' ]
 	);
+
 	with 'DeviceMaster::Device';
 
 	has '+Features' => (

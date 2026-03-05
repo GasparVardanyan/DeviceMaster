@@ -601,7 +601,7 @@ And with this bash script:
 #!/usr/bin/env bash
 
 jq -c .$(jq -r 'keys[]' /desktop/devicemaster.json | dmenu -p mode -l 10) /desktop/devicemaster.json \
-	| socat STDIO,ignoreeof UNIX-CONNECT:/tmp/devicemaster.socket \
+	| socat STDIO UNIX-CONNECT:/tmp/devicemaster.socket \
 	| jq > /tmp/dmout.json
 
 st -n pop-up -g 120x30 -e $SHELL -c 'nvim /tmp/dmout.json'

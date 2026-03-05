@@ -11,8 +11,9 @@ use warnings;
 
 package DeviceMaster::Device::Battery {
 	use namespace::autoclean;
-	use Moose;
+	use Moo;
 
+	use DeviceMaster::Device;
 	use DeviceMaster::Feature;
 
 	my %_Features = map { $_ => DeviceMaster::FeatureFile->new (
