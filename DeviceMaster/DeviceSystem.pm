@@ -7,11 +7,6 @@ package DeviceMaster::DeviceSystem {
 	# use Moose::Util::TypeConstraints;
 
 	use DeviceMaster::Utils::Serializable;
-	sub _serializable_attributes {
-		[qw(
-		)];
-	}
-	with 'DeviceMaster::Utils::Serializable';
 
 	use Cwd ();
 
@@ -84,6 +79,9 @@ package DeviceMaster::DeviceSystem {
 		init_arg => undef,
 		default => sub { {} }
 	);
+
+	sub _serializable_attributes { []; }
+	with 'DeviceMaster::Utils::Serializable';
 
 	sub BUILD {
 		my $self = shift;

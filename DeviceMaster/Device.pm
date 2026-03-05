@@ -5,7 +5,12 @@ package DeviceMaster::Device {
 	use namespace::autoclean;
 	use Moo::Role;
 
+	use DeviceMaster::FeatureInterface;
+	use DeviceMaster::Feature;
+	use DeviceMaster::Virtual::FeatureVirtualInterfaces;
+
 	use DeviceMaster::Utils::Serializable;
+	sub _serializable_attributes { ['id', 'feature_interfaces']; }
 	with 'DeviceMaster::Utils::Serializable';
 
 	has id => ( is => 'ro', isa => Types::Standard::Str );
@@ -26,13 +31,11 @@ package DeviceMaster::Device {
 		is => 'ro',
 		isa => Types::Standard::Str,
 		default => '',
-		traits => ['DoNotSerialize']
 	);
 
 	has Features => (
 		is => 'ro',
 		isa => Types::Standard::HashRef[Types::Standard::ConsumerOf['DeviceMaster::Feature']],
-		traits => ['DoNotSerialize'],
 		init_arg => undef,
 		default => sub { {} }
 	);
@@ -40,7 +43,6 @@ package DeviceMaster::Device {
 	has FeaturesVirtual => (
 		is => 'ro',
 		isa => Types::Standard::HashRef[Types::Standard::ConsumerOf['DeviceMaster::Virtual::FeatureVirtual']],
-		traits => ['DoNotSerialize'],
 		init_arg => undef,
 		default => sub { {} }
 	);

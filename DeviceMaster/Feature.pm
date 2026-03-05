@@ -75,6 +75,10 @@ package DeviceMaster::FeatureInterface {
 	use namespace::autoclean;
 	use Moo::Role;
 
+	use DeviceMaster::Utils::Serializable;
+	sub _serializable_attributes { []; }
+	with 'DeviceMaster::Utils::Serializable';
+
 	requires 'read';
 	requires 'write';
 
@@ -115,10 +119,6 @@ package DeviceMaster::FeatureInterface {
 package DeviceMaster::FeatureFileInterface {
 	use namespace::autoclean;
 	use Moo;
-
-	use DeviceMaster::Utils::Serializable;
-
-	with 'DeviceMaster::Utils::Serializable';
 
 	with 'DeviceMaster::FeatureInterface';
 
