@@ -12,14 +12,12 @@ package DeviceMaster::Virtual::FeatureChoiceInterface {
 	has choices => (
 		is => 'ro',
 		isa => Types::Standard::ScalarRef[Types::Standard::ConsumerOf['DeviceMaster::FeatureInterface']],
-		traits => ['DoNotSerialize'],
 		required => 1,
 	);
 
 	has target => (
 		is => 'ro',
 		isa => Types::Standard::ScalarRef[Types::Standard::ConsumerOf['DeviceMaster::FeatureInterface']],
-		traits => ['DoNotSerialize'],
 		required => 1,
 	);
 

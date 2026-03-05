@@ -12,21 +12,18 @@ package DeviceMaster::Virtual::FeaturePercentageInterface {
 	has lower_bound => (
 		is => 'ro',
 		isa => Types::Standard::ScalarRef[Types::Standard::ConsumerOf['DeviceMaster::FeatureInterface']],
-		traits => ['DoNotSerialize'],
 		required => 1,
 	);
 
 	has upper_bound => (
 		is => 'ro',
 		isa => Types::Standard::ScalarRef[Types::Standard::ConsumerOf['DeviceMaster::FeatureInterface']],
-		traits => ['DoNotSerialize'],
 		required => 1,
 	);
 
 	has target => (
 		is => 'ro',
 		isa => Types::Standard::ScalarRef[Types::Standard::ConsumerOf['DeviceMaster::FeatureInterface']],
-		traits => ['DoNotSerialize'],
 		required => 1,
 	);
 
@@ -34,7 +31,6 @@ package DeviceMaster::Virtual::FeaturePercentageInterface {
 		is => 'rw',
 		isa => Types::Standard::Bool,
 		init_arg => undef,
-		traits => ['DoNotSerialize']
 	);
 
 	sub read {

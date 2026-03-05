@@ -9,10 +9,11 @@ package DeviceMaster::FeatureFileInterface {
 
 	use DeviceMaster::Utils;
 
+	use Time::HiRes ();
+
 	has path => (
 		is => 'ro',
 		isa => Types::Standard::Str,
-		traits => ['DoNotSerialize'],
 		required => 1
 	);
 
@@ -30,6 +31,8 @@ package DeviceMaster::FeatureFileInterface {
 			$self->path,
 			$value
 		);
+
+		Time::HiRes::usleep 10000;
 	}
 
 	__PACKAGE__->meta->make_immutable;

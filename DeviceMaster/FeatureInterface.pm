@@ -15,7 +15,6 @@ package DeviceMaster::FeatureInterface {
 	has value => (
 		is => 'rw',
 		isa => Types::Standard::Str,
-		traits => ['DoNotSerialize']
 	);
 
 	has readable => ( is => 'ro', isa => Types::Standard::Bool, required => 1 );

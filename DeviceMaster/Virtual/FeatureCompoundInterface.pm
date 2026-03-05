@@ -15,7 +15,6 @@ package DeviceMaster::Virtual::FeatureCompoundInterface {
 	has targets => (
 		is => 'ro',
 		isa => Types::Standard::HashRef[Types::Standard::ScalarRef[Types::Standard::ConsumerOf['DeviceMaster::FeatureInterface']]],
-		traits => ['DoNotSerialize'],
 		required => 1,
 	);
 
@@ -23,7 +22,6 @@ package DeviceMaster::Virtual::FeatureCompoundInterface {
 		is => 'rw',
 		isa => Types::Standard::HashRef[Types::Standard::Bool],
 		init_arg => undef,
-		traits => ['DoNotSerialize'],
 		default => sub { {} }
 	);
 
