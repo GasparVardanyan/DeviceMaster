@@ -31,10 +31,13 @@ package DeviceMaster::AppUtils::JSONProcessor {
 			if (exists $j->{type}) {
 				my $type = $j->{type};
 
+				my $return_path = (exists $j->{return_path} && $j->{return_path}) ? 1 : 0;
+
 				if ('Get' eq $type) {
 					if (exists $j->{path}) {
 						my $packet = DeviceMaster::AppUtils::Packet::Get->new (
-							path => $j->{path}
+							path => $j->{path},
+							return_path => $return_path
 						);
 
 						$r = $self->packet_processor->process ($packet);
@@ -47,7 +50,8 @@ package DeviceMaster::AppUtils::JSONProcessor {
 					if (exists $j->{path} && exists $j->{value}) {
 						my $packet = DeviceMaster::AppUtils::Packet::Set->new (
 							path => $j->{path},
-							value => $j->{value}
+							value => $j->{value},
+							return_path => $return_path
 						);
 
 						$r = $self->packet_processor->process ($packet);

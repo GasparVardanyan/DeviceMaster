@@ -6,6 +6,8 @@ use warnings;
 package DeviceMaster::AppUtils::Packet {
 	use namespace::autoclean;
 	use Moo::Role;
+
+	use Types::Standard ();
 	# use Moose::Util;
 	# use Moose::Util::TypeConstraints;
 
@@ -15,6 +17,12 @@ package DeviceMaster::AppUtils::Packet {
 		is => 'ro',
 		# isa => 'DeviceMaster::AppUtils::Daemon::Packet::Type',
 		required => 1
+	);
+
+	has return_path => (
+		is => 'ro',
+		isa => Types::Standard::Bool,
+		default => sub { 0 }
 	);
 };
 
