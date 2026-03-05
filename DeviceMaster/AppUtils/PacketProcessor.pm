@@ -5,6 +5,8 @@ package DeviceMaster::AppUtils::PacketProcessor {
 	use namespace::autoclean;
 	use Moo;
 
+	use DeviceMaster::DeviceSystem;
+	use DeviceMaster::AppUtils::Packet;
 	use DeviceMaster::AppUtils::PathBridge;
 
 	has path_bridge => (
