@@ -5,6 +5,7 @@ package DeviceMaster::Device {
 	use namespace::autoclean;
 	use Moo::Role;
 
+	use DeviceMaster::Utils::Serializable;
 	with 'DeviceMaster::Utils::Serializable';
 
 	has id => ( is => 'ro', isa => Types::Standard::Str );

@@ -46,7 +46,7 @@ package DeviceMaster::AppUtils::JSONServer {
 		is => 'rw',
 		isa => Types::Standard::InstanceOf['JSON::XS'],
 		init_arg => undef,
-		default => sub { JSON::XS->new->utf8->canonical; }
+		default => sub { JSON::XS->new->utf8->canonical->convert_blessed; }
 	);
 
 	has command_q => (

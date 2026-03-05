@@ -6,6 +6,11 @@ package DeviceMaster::DeviceSystem {
 	use Moo;
 	# use Moose::Util::TypeConstraints;
 
+	use DeviceMaster::Utils::Serializable;
+	sub _serializable_attributes {
+		[qw(
+		)];
+	}
 	with 'DeviceMaster::Utils::Serializable';
 
 	use Cwd ();

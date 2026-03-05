@@ -12,10 +12,6 @@ package DeviceMaster::Apps::Daemon {
 
 	use Types::Standard ();
 
-	use DeviceMaster::DeviceSystem;
-	use DeviceMaster::Device;
-	use DeviceMaster::FeatureInterface;
-
 	use DeviceMaster::AppUtils::JSONProcessor;
 
 	has json_processor => (
@@ -32,7 +28,6 @@ package DeviceMaster::Apps::Daemon {
 
 		return $self->json_processor->process ($cmd);
 	}
-
 
 	__PACKAGE__->meta->make_immutable;
 }

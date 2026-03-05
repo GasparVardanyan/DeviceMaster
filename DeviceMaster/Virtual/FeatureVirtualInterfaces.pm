@@ -6,7 +6,6 @@ package DeviceMaster::Virtual::FeatureConstantInterface {
 	use Moo;
 
 	use DeviceMaster::FeatureInterface;
-	use DeviceMaster::Utils::Serializable;
 
 	sub read {
 		my $self = shift;
@@ -43,10 +42,7 @@ package DeviceMaster::Virtual::FeaturePercentageInterface {
 	use Types::Standard ();
 
 	use DeviceMaster::FeatureInterface;
-	use DeviceMaster::Utils::Serializable;
 	use DeviceMaster::Types;
-
-	with 'DeviceMaster::Utils::Serializable';
 
 	has lower_bound => (
 		is => 'ro',
@@ -154,10 +150,7 @@ package DeviceMaster::Virtual::FeatureCompoundInterface {
 	use List::Util ();
 
 	use DeviceMaster::FeatureInterface;
-	use DeviceMaster::Utils::Serializable;
 	use DeviceMaster::Types;
-
-	with 'DeviceMaster::Utils::Serializable';
 
 	has targets => (
 		is => 'ro',
@@ -245,10 +238,7 @@ package DeviceMaster::Virtual::FeatureChoiceInterface {
 	use Moo;
 
 	use DeviceMaster::FeatureInterface;
-	use DeviceMaster::Utils::Serializable;
 	use DeviceMaster::Types;
-
-	with 'DeviceMaster::Utils::Serializable';
 
 	has choices => (
 		is => 'ro',
