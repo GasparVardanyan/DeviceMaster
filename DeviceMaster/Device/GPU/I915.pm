@@ -5,6 +5,7 @@ package DeviceMaster::Device::GPU::I915 {
 	use namespace::autoclean;
 	use Moo;
 
+	use DeviceMaster::Device;
 	use DeviceMaster::Feature;
 
 	use List::Util ();

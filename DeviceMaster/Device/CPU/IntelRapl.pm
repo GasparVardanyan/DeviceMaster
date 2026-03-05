@@ -13,6 +13,7 @@ package DeviceMaster::Device::CPU::IntelRapl {
 	use namespace::autoclean;
 	use Moo;
 
+	use DeviceMaster::Device;
 	use DeviceMaster::Feature;
 
 	use File::Basename ();

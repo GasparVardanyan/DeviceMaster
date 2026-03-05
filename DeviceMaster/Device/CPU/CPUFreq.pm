@@ -13,8 +13,12 @@ package DeviceMaster::Device::CPU::CPUFreq {
 	use namespace::autoclean;
 	use Moo;
 
+	use DeviceMaster::Device;
 	use DeviceMaster::Feature;
-	use DeviceMaster::Virtual::FeatureVirtualInterfaces;
+	use DeviceMaster::Virtual::FeatureVirtual;
+	use DeviceMaster::Virtual::FeatureCompoundInterface;
+	use DeviceMaster::Virtual::FeaturePercentageInterface;
+	use DeviceMaster::Virtual::FeatureChoiceInterface;
 
 	use List::Util ();
 

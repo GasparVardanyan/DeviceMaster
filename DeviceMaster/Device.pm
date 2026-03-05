@@ -5,9 +5,8 @@ package DeviceMaster::Device {
 	use namespace::autoclean;
 	use Moo::Role;
 
-	use DeviceMaster::FeatureInterface;
 	use DeviceMaster::Feature;
-	use DeviceMaster::Virtual::FeatureVirtualInterfaces;
+	use DeviceMaster::Virtual::FeatureVirtual;
 
 	use DeviceMaster::Utils::Serializable;
 	sub _serializable_attributes { ['id', 'feature_interfaces']; }
