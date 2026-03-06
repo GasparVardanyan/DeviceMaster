@@ -48,7 +48,7 @@ package DeviceMaster::AppUtils::PacketProcessor {
 					map {
 						$_ => $self->process (DeviceMaster::AppUtils::Packet::Get->new (
 							path => $cmd->path . "/$_"
-						))->{response}
+						))->{response} # NOTE: this takes only the actual value
 					} keys %${$item->ref}
 				}, success => 1 };
 			}

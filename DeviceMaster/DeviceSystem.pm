@@ -124,8 +124,8 @@ package DeviceMaster::DeviceSystem {
 
 		if (
 			$self->dmi_id->acquire ('product_family') eq 'GSeries' # FIXME: Probably Alienware devices have another 'family'
-			&& ($self->dmi_id->acquire ('product_name') =~ /(?:^(?:Dell|Alienware))|(?:^G7 7500$)/)
-			# https://github.com/tr1xem/AWCC/blob/889cc70777c1b416c0707092340f1ac52618d791/database.json
+			&& ($self->dmi_id->acquire ('product_name') =~ /(?:^(?:Dell|Alienware))|(?:^G3 3590$)|(?:^G5 5590$)|(?:^G7 7500$)|(?:^G7 7700$)/)
+			# https://github.com/tr1xem/AWCC/blob/cb05cb8da2831fcc85223b2a5ce1e430b46da01d/database.json
 		) {
 			$self->{device_type} = 'Alienware';
 		}
@@ -169,7 +169,7 @@ package DeviceMaster::DeviceSystem {
 				my $card_driver_path             =   Cwd::abs_path ($card_driver_symlink);
 				my ($card_driver_name)           =   $card_driver_path =~ qr#\/([^/]+)\/?$#;
 
-				if ("i915" eq $card_driver_name) {
+				if ('i915' eq $card_driver_name) {
 					$self->gpu->{$card} = DeviceMaster::Device::GPU::I915-> new (
 						dir => $card_dir,
 						id => $card,

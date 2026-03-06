@@ -35,7 +35,7 @@ package DeviceMaster::Device::CPU::IntelRapl {
 	around _serializable_attributes => sub {
 		my ($orig, $self) = @_;
 		my $attrs = $self->$orig;
-		push @$attrs, "subzones";
+		push @$attrs, 'subzones';
 		return $attrs;
 	};
 
