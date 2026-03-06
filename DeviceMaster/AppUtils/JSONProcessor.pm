@@ -36,7 +36,7 @@ package DeviceMaster::AppUtils::JSONProcessor {
 				if ('Get' eq $type) {
 					if (exists $j->{path}) {
 						my $packet = DeviceMaster::AppUtils::Packet::Get->new (
-							path => $j->{path},
+							path => $self->sanitize_path ($j->{path}),
 							return_path => $return_path
 						);
 
@@ -49,7 +49,7 @@ package DeviceMaster::AppUtils::JSONProcessor {
 				elsif ('Set' eq $type) {
 					if (exists $j->{path} && exists $j->{value}) {
 						my $packet = DeviceMaster::AppUtils::Packet::Set->new (
-							path => $j->{path},
+							path => $self->sanitize_path ($j->{path}),
 							value => $j->{value},
 							return_path => $return_path
 						);
@@ -82,6 +82,19 @@ package DeviceMaster::AppUtils::JSONProcessor {
 		else {
 			return { response => '', success => 0, error => 'invalid json signature' };
 		}
+	}
+
+	sub sanitize_path {
+		my $self = shift;
+		my $path = shift;
+		$path =~ s/\s+//g;
+		$path =~ s/\/+/\//g;
+
+		if ($path ne '/') {
+			$path =~ s/\/$//;
+		}
+
+		return $path;
 	}
 
 	__PACKAGE__->meta->make_immutable;
