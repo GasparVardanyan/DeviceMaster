@@ -90,7 +90,7 @@ package DeviceMaster::AppUtils::JSONProcessor {
 		$path =~ s/\s+//g;
 		$path =~ s/\/+/\//g;
 
-		if ($path ne '/') {
+		if ('/' ne $path) {
 			$path =~ s/\/$//;
 		}
 

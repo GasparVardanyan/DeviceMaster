@@ -169,7 +169,7 @@ package DeviceMaster::DeviceSystem {
 				my $card_driver_path             =   Cwd::abs_path ($card_driver_symlink);
 				my ($card_driver_name)           =   $card_driver_path =~ qr#\/([^/]+)\/?$#;
 
-				if ("i915" eq $card_driver_name) {
+				if ('i915' eq $card_driver_name) {
 					$self->gpu->{$card} = DeviceMaster::Device::GPU::I915-> new (
 						dir => $card_dir,
 						id => $card,

@@ -58,7 +58,7 @@ package DeviceMaster::Virtual::FeatureCompoundInterface {
 			my $self = shift;
 			my @status_arr = List::Util::uniq map { ${$self->targets->{$_}}->readable } keys %{ $self->targets };
 			if (@status_arr != 1) {
-				die "All features interfaces in the virtual compount interface must possess the same readability state";
+				die 'All features interfaces in the virtual compount interface must possess the same readability state';
 			}
 			return $status_arr[0];
 		},
@@ -71,7 +71,7 @@ package DeviceMaster::Virtual::FeatureCompoundInterface {
 			my $self = shift;
 			my @status_arr = List::Util::uniq map { ${$self->targets->{$_}}->writable } keys %{ $self->targets };
 			if (@status_arr != 1) {
-				die "All features interfaces in the virtual compount interface must possess the same writablity state";
+				die 'All features interfaces in the virtual compount interface must possess the same writablity state';
 			}
 			return $status_arr[0];
 		},
