@@ -12,6 +12,7 @@ package DeviceMaster::AppUtils::JSONServer {
 	use Thread::Queue ();
 	use IO::Socket::UNIX ();
 	use JSON::XS ();
+	use Socket ();
 
 	requires 'process_command';
 
@@ -79,7 +80,11 @@ package DeviceMaster::AppUtils::JSONServer {
 						$r = $self->json->encode ({ response => '', success => 0, error => 'invalid json' });
 					}
 
-					$client->print ($r, "\n");
+					my $bytes = $client->send ("$r\n", Socket::MSG_NOSIGNAL);
+
+					if (!defined $bytes) {
+						last;
+					}
 				}
 
 				$client->close;
