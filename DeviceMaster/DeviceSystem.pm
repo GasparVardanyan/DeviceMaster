@@ -11,7 +11,6 @@ package DeviceMaster::DeviceSystem {
 	use Cwd ();
 
 	use Data::Dumper ();
-	use Data::Diver ();
 	use File::Basename ();
 
 	# enum DeviceType => [ 'Alienware', 'Generic' ];
@@ -108,11 +107,29 @@ package DeviceMaster::DeviceSystem {
 		my $self = shift;
 		my $path = shift;
 
+		$path =~ s/\s+//g;
+		$path =~ s/\/+/\//g;
+
 		if ('/' eq $path) {
 			return \$self;
 		}
 		elsif ($path =~ s/^\///) {
-			return Data::Diver::DiveRef ($self, split '/', $path);
+			$path =~ s/\/$//;
+
+			my $ref = \$self;
+
+			for my $key (split '/', $path) {
+				my $r = ref $ref;
+
+				if (exists ${$ref}->{$key}) {
+					$ref = \${$ref}->{$key};
+				} else {
+					$ref = undef;
+					last;
+				}
+			}
+
+			return $ref;
 		}
 		else {
 			return undef;

@@ -34,8 +34,9 @@ package DeviceMaster::AppUtils::PacketProcessor {
 					$r->{choices} = [ split ' ', ${${$item->ref}->choices}->acquire ];
 				}
 				elsif ('FeaturePercentageInterface' eq $item->feature_type) {
-					$r->{lower_bound} = ${${$item->ref}->lower_bound}->acquire;
-					$r->{upper_bound} = ${${$item->ref}->upper_bound}->acquire;
+					$r->{lower_bound} = 0 + ${${$item->ref}->lower_bound}->acquire;
+					$r->{upper_bound} = 0 + ${${$item->ref}->upper_bound}->acquire;
+					$r->{response} = 0 + $r->{response};
 				}
 			}
 			elsif (
