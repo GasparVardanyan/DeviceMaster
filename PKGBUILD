@@ -1,16 +1,19 @@
 pkgname=devicemaster
-pkgver=r25.21831d8
+pkgver=r32.227a7d3
 pkgrel=1
+pkgdesc='device management utility for linux'
 arch=('x86_64')
-depends=('perl')
-optdepends=(
-	'perl-namespace-autoclean: use system perl-namespace-autoclean'
-	'perl-moo: use system perl-moo'
-	'perl-type-tiny: use system perl-type-tiny'
-	'perl-json-xs: use system perl-json-xs'
+depends=(
+	'perl'
+	'perl-namespace-autoclean'
+	'perl-moo'
+	'perl-type-tiny'
+	'perl-json-xs'
 )
-makedepends=('perl' 'perl-par-packer' 'cpanminus' 'perl-local-lib')
-options=('!strip')
+license=('custom')
+options=('!emptydirs' '!debug')
+# for personal tests:
+# source=('devicemaster::git+file:///src/repos/DeviceMaster.git#branch=gaspar')
 source=('devicemaster::git+https://github.com/GasparVardanyan/DeviceMaster')
 sha256sums=('SKIP')
 
@@ -19,34 +22,24 @@ pkgver() {
 	printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
 }
 
-prepare() {
-	cd "$srcdir/$pkgname"
-
-	source /etc/profile
-
-	eval "$(perl -I vendor/lib/perl5 -Mlocal::lib=vendor)"
-	PERL5LIB=vendor cpanm --local-lib=vendor --installdeps .
-}
-
 build() {
-	cd "$srcdir/$pkgname"
+	cd $pkgname
 
-	source /etc/profile
+	(
+		# https://github.com/BlackArch/blackarch-pkgbuilds/blob/master/PKGBUILD-perl-lib
+		export PERL_MM_USE_DEFAULT=1 PERL5LIB="" PERL_AUTOINSTALL=--skipdeps \
+		PERL_MM_OPT="INSTALLDIRS=vendor DESTDIR='$pkgdir'" \
+		PERL_MB_OPT="--installdirs vendor --destdir '$pkgdir'" \
+		MODULEBUILDRC=/dev/null
 
-	eval "$(perl -I vendor/lib/perl5 -Mlocal::lib=vendor)"
+		/usr/bin/perl Makefile.PL
 
-	pp \
-		-c \
-		-I . \
-		-I vendor/lib/perl5 \
-		-I vendor/lib/perl5/x86_64-linux-thread-multi \
-		-A vendor \
-		-a vendor/lib/perl5 \
-		-a vendor/lib/perl5/x86_64-linux-thread-multi \
-		-o DM DeviceMaster.pl
+		make
+	)
 }
 
 package() {
-	install -Dm755 "$srcdir/$pkgname/DM" "$pkgdir/usr/bin/devicemaster"
+	cd $pkgname
 	install -Dm644 "$srcdir/$pkgname/LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+	make DESTDIR="$pkgdir" install
 }
