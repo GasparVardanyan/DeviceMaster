@@ -4,29 +4,16 @@ use warnings;
 package DeviceMaster::Utils::Serializable {
 	use namespace::autoclean;
 	use Moo::Role;
-	use Moo::Role::ToJSON;
 
-	use Types::Standard ();
+	requires 'serializable_attributes';
 
-	with 'Moo::Role::ToJSON';
-
-	requires '_serializable_attributes';
-
-	has __CLASS__ => (
-		is => 'ro',
-		isa => Types::Standard::Str,
-		init_arg => undef,
-		default => sub {
-			my $self = shift;
-			ref $self;
-		}
-	);
-
-	sub _build_serializable_attributes {
+	sub TO_JSON {
 		my $self = shift;
-		my $attrs = $self->_serializable_attributes;
-		unshift @$attrs, '__CLASS__';
-		return $attrs;
+
+		return {
+			'__CLASS__' => ref $self,
+			map { $_ => $self->$_ } @{ $self->serializable_attributes }
+		};
 	}
 }
 

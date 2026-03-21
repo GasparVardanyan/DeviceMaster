@@ -79,7 +79,7 @@ package DeviceMaster::DeviceSystem {
 		default => sub { {} }
 	);
 
-	sub _serializable_attributes { [qw(
+	sub serializable_attributes { [qw(
 		dmi_id
 		batteries
 		backlights
