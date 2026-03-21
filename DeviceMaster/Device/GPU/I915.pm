@@ -49,7 +49,7 @@ package DeviceMaster::Device::GPU::I915 {
 
 	with 'DeviceMaster::Device';
 
-	around _serializable_attributes => sub {
+	around serializable_attributes => sub {
 		my ($orig, $self) = @_;
 		my $attrs = $self->$orig;
 		push @$attrs, 'driver';

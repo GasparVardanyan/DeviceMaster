@@ -9,7 +9,7 @@ package DeviceMaster::Device {
 	use DeviceMaster::Virtual::FeatureVirtual;
 
 	use DeviceMaster::Utils::Serializable;
-	sub _serializable_attributes { ['id', 'feature_interfaces', 'feature_interfaces_virtual']; }
+	sub serializable_attributes { ['id', 'feature_interfaces', 'feature_interfaces_virtual']; }
 	with 'DeviceMaster::Utils::Serializable';
 
 	has id => ( is => 'ro', isa => Types::Standard::Str );

@@ -57,7 +57,7 @@ package DeviceMaster::Device::CPU::CPUFreq {
 
 	with 'DeviceMaster::Device';
 
-	around _serializable_attributes => sub {
+	around serializable_attributes => sub {
 		my ($orig, $self) = @_;
 		my $attrs = $self->$orig;
 		push @$attrs, 'policies';
