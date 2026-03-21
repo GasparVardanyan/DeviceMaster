@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+SOURCE_DIR=$(dirname "${BASH_SOURCE[0]}")
+
+jq -c .$(jq -r 'keys[]' $SOURCE_DIR/devicemaster.json | fzf) $SOURCE_DIR/devicemaster.json | socat STDIO UNIX-CONNECT:/tmp/devicemaster.socket | jq

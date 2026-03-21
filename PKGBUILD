@@ -1,5 +1,5 @@
 pkgname=devicemaster
-pkgver=r32.227a7d3
+pkgver=r33.328921a
 pkgrel=1
 pkgdesc='device management utility for linux'
 arch=('x86_64')
