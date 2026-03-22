@@ -13,6 +13,7 @@ package DeviceMaster::AppUtils::JSONServer {
 	use IO::Socket::UNIX ();
 	use JSON::XS ();
 	use Socket ();
+	use POSIX ();
 
 	requires 'process_command';
 
@@ -54,55 +55,94 @@ package DeviceMaster::AppUtils::JSONServer {
 		is => 'ro',
 		isa => Types::Standard::InstanceOf['Thread::Queue'],
 		init_arg => undef,
-		default => sub {
-			Thread::Queue->new;
-		}
+		default => sub { Thread::Queue->new; }
 	);
+
+	has client_q => (
+		is => 'ro',
+		isa => Types::Standard::InstanceOf['Thread::Queue'],
+		init_arg => undef,
+		default => sub { Thread::Queue->new; }
+	);
+
+	has num_workers => (
+		is => 'ro',
+		isa => Types::Standard::Int,
+		default => sub { 5; }
+	);
+
+	has workers => (
+		is => 'ro',
+		isa => Types::Standard::ArrayRef[Types::Standard::InstanceOf['threads']],
+		init_arg => undef,
+		default => sub {
+			my $self = shift;
+			return [
+				map {
+					threads->create(sub {
+						while (my $client_fd = $self->client_q->dequeue) {
+							$self->process_client ($client_fd);
+						}
+					})
+				} 1 .. $self->num_workers
+			];
+		},
+		lazy => 1
+	);
+
+	sub process_client {
+		my $self = shift;
+		my $cfd = shift;
+
+		my $client = IO::Socket::UNIX->new ();
+		$client->fdopen ($cfd, "+<");
+
+		my $result_q = Thread::Queue->new;
+
+		while (my $cmd = <$client>) {
+			chomp $cmd;
+			last unless defined $cmd;
+
+			my $r;
+
+			my $j = eval { $self->json->decode ($cmd) };
+			if (!$@) {
+				$self->command_q->enqueue ([ $result_q, $j ]);
+				$r = $result_q->dequeue;
+			}
+			else {
+				$r = $self->json->encode ({ response => '', success => 0, error => 'invalid json' });
+			}
+
+			my $bytes = $client->send ("$r\n", Socket::MSG_NOSIGNAL);
+
+			if (!defined $bytes) {
+				last;
+			}
+		}
+
+		$client->close;
+	}
 
 	sub listen {
 		my $self = shift;
 		while (my $client = $self->server->accept) {
-			threads->create (sub {
-				my $result_q = Thread::Queue->new;
-
-				while (my $cmd = <$client>) {
-					chomp $cmd;
-					last unless defined $cmd;
-
-					my $r;
-
-					my $j = eval { $self->json->decode ($cmd) };
-					if (!$@) {
-						$self->command_q->enqueue ([ $result_q, $j ]);
-						$r = $result_q->dequeue;
-					}
-					else {
-						$r = $self->json->encode ({ response => '', success => 0, error => 'invalid json' });
-					}
-
-					my $bytes = $client->send ("$r\n", Socket::MSG_NOSIGNAL);
-
-					if (!defined $bytes) {
-						last;
-					}
-				}
-
-				$client->close;
-			})->detach;
+			$self->client_q->enqueue (POSIX::dup (fileno ($client)));
 		}
 	}
 
 	sub BUILD {
 		my $self = shift;
+		$self->workers;
 
 		threads->create (sub {
 			while (1) {
 				my $task = $self->command_q->dequeue;
-				my ($client_q, $cmd) = @$task;
+				my ($response_q, $cmd) = @$task;
 
 				my $result = $self->process_command ($cmd);
 
-				$client_q->enqueue ($self->json->encode ($result));
+				$response_q->enqueue ($self->json->encode ($result));
 			}
 		});
 	}
