@@ -86,7 +86,7 @@ package DeviceMaster::Virtual::FeaturePercentageInterface {
 	);
 
 	has '+value' => (
-		isa => DeviceMaster::Types::Percentage ()
+		isa => DeviceMaster::Types::Percentage
 	);
 
 	around set => sub {

@@ -29,6 +29,12 @@ package DeviceMaster::AppUtils::JSONServer {
 		# documentation => 'group to own the socket file'
 	);
 
+	has num_workers => (
+		is => 'ro',
+		isa => Types::Standard::Int,
+		default => sub { 5; }
+	);
+
 	has server => (
 		is => 'ro',
 		isa => Types::Standard::InstanceOf['IO::Socket::UNIX'],
@@ -65,12 +71,6 @@ package DeviceMaster::AppUtils::JSONServer {
 		default => sub { Thread::Queue->new; }
 	);
 
-	has num_workers => (
-		is => 'ro',
-		isa => Types::Standard::Int,
-		default => sub { 5; }
-	);
-
 	has workers => (
 		is => 'ro',
 		isa => Types::Standard::ArrayRef[Types::Standard::InstanceOf['threads']],
@@ -94,7 +94,7 @@ package DeviceMaster::AppUtils::JSONServer {
 		my $self = shift;
 		my $cfd = shift;
 
-		my $client = IO::Socket::UNIX->new ();
+		my $client = IO::Socket::UNIX->new;
 		$client->fdopen ($cfd, "+<");
 
 		my $result_q = Thread::Queue->new;
