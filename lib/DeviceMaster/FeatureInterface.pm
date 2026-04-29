@@ -5,6 +5,8 @@ package DeviceMaster::FeatureInterface {
 	use namespace::autoclean;
 	use Moo::Role;
 
+	use Types::Standard ();
+
 	use DeviceMaster::Utils::Serializable;
 	sub serializable_attributes { ['readable', 'writable']; }
 	with 'DeviceMaster::Utils::Serializable';

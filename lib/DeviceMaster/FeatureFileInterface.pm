@@ -5,6 +5,8 @@ package DeviceMaster::FeatureFileInterface {
 	use namespace::autoclean;
 	use Moo;
 
+	use Types::Standard ();
+
 	with 'DeviceMaster::FeatureInterface';
 
 	use DeviceMaster::Utils;
