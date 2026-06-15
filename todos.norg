@@ -1,6 +1,7 @@
 * TODOS
-  ~ (-) Thread pool for json server sockets
+  ~ (x) Thread pool for json server sockets
   ~ (-) cli args support for selecting the group ownership of the daemon's socket file
+  ~ (-) restructure features and devices
   ~ (=) acpi support
   ~ (=) libusb support
   ~ (=) automated fan control support

@@ -61,7 +61,7 @@ package DeviceMaster::AppUtils::PathBridge {
 
 	has deviceSystem => (
 		is => 'ro',
-		# isa => Types::Standard::ScalarRef[Types::Standard::InstanceOf['DeviceMaster::DeviceSystem']],
+		isa => Types::Standard::ScalarRef[Types::Standard::InstanceOf['DeviceMaster::DeviceSystem']],
 		required => 1
 	);
 
@@ -85,7 +85,7 @@ package DeviceMaster::AppUtils::PathBridge {
 			$path_short =~ s/\bfeature_interfaces\b/FI/g;
 			$path_short =~ s/\bfeature_interfaces_virtual\b/FIV/g;
 
-			my $ref = $self->deviceSystem->dive ($path);
+			my $ref = ${$self->deviceSystem}->dive ($path);
 			my $type;
 			my $feature_type = 'Unset';
 

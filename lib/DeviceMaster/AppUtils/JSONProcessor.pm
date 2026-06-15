@@ -8,12 +8,35 @@ package DeviceMaster::AppUtils::JSONProcessor {
 	use DeviceMaster::AppUtils::PacketProcessor;
 	use DeviceMaster::AppUtils::Packet;
 
+	has deviceSystem => (
+		is => 'ro',
+		isa => Types::Standard::ScalarRef[Types::Standard::InstanceOf['DeviceMaster::DeviceSystem']],
+		required => 1
+	);
+
+	has path_bridge => (
+		is => 'ro',
+		isa => Types::Standard::ScalarRef[Types::Standard::InstanceOf['DeviceMaster::AppUtils::PathBridge']],
+		default => sub {
+			my $self = shift;
+			return \DeviceMaster::AppUtils::PathBridge->new (
+				deviceSystem => $self->deviceSystem
+			);
+		},
+		lazy => 1
+	);
+
 	has packet_processor => (
 		is => 'ro',
-		isa => Types::Standard::InstanceOf['DeviceMaster::AppUtils::PacketProcessor'],
+		isa => Types::Standard::ScalarRef[Types::Standard::InstanceOf['DeviceMaster::AppUtils::PacketProcessor']],
 		default => sub {
-			return DeviceMaster::AppUtils::PacketProcessor->new;
-		}
+			my $self = shift;
+			return \DeviceMaster::AppUtils::PacketProcessor->new (
+				deviceSystem => $self->deviceSystem,
+				path_bridge => $self->path_bridge,
+			);
+		},
+		lazy => 1
 	);
 
 	sub process {
@@ -40,7 +63,7 @@ package DeviceMaster::AppUtils::JSONProcessor {
 							return_path => $return_path
 						);
 
-						$r = $self->packet_processor->process ($packet);
+						$r = ${$self->packet_processor}->process ($packet);
 					}
 					else {
 						$r->{error} = 'Get request must have a path';
@@ -54,7 +77,7 @@ package DeviceMaster::AppUtils::JSONProcessor {
 							return_path => $return_path
 						);
 
-						$r = $self->packet_processor->process ($packet);
+						$r = ${$self->packet_processor}->process ($packet);
 					}
 					else {
 						$r->{error} = 'Set request must have path and value';

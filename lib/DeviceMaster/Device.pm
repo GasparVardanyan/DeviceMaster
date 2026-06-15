@@ -7,6 +7,7 @@ package DeviceMaster::Device {
 
 	use DeviceMaster::Feature;
 	use DeviceMaster::Virtual::FeatureVirtual;
+	use DeviceMaster::FeatureInterface;
 
 	use DeviceMaster::Utils::Serializable;
 	sub serializable_attributes { ['id', 'feature_interfaces', 'feature_interfaces_virtual']; }

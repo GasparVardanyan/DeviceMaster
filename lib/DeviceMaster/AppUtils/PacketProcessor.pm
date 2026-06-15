@@ -9,21 +9,29 @@ package DeviceMaster::AppUtils::PacketProcessor {
 	use DeviceMaster::AppUtils::Packet;
 	use DeviceMaster::AppUtils::PathBridge;
 
+	has deviceSystem => (
+		is => 'ro',
+		isa => Types::Standard::ScalarRef[Types::Standard::InstanceOf['DeviceMaster::DeviceSystem']],
+		required => 1
+	);
+
 	has path_bridge => (
 		is => 'ro',
-		isa => Types::Standard::InstanceOf['DeviceMaster::AppUtils::PathBridge'],
+		isa => Types::Standard::ScalarRef[Types::Standard::InstanceOf['DeviceMaster::AppUtils::PathBridge']],
 		default => sub {
-			return DeviceMaster::AppUtils::PathBridge->new (
-				deviceSystem => DeviceMaster::DeviceSystem->new
+			my $self = shift;
+			return \DeviceMaster::AppUtils::PathBridge->new (
+				deviceSystem => $self->deviceSystem
 			);
-		}
+		},
+		lazy => 1
 	);
 
 	sub process {
 		my $self = shift;
 		my $cmd = shift;
 
-		my $item = $self->path_bridge->getItem ($cmd->path);
+		my $item = ${$self->path_bridge}->getItem ($cmd->path);
 
 		my $r;
 

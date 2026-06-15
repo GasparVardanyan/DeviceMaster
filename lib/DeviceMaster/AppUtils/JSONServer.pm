@@ -95,7 +95,7 @@ package DeviceMaster::AppUtils::JSONServer {
 		my $cfd = shift;
 
 		my $client = IO::Socket::UNIX->new;
-		$client->fdopen ($cfd, "+<");
+		$client->fdopen ($cfd, '+<');
 
 		my $result_q = Thread::Queue->new;
 
