@@ -10,7 +10,6 @@ package DeviceMaster::DeviceSystem {
 
 	use Cwd ();
 
-	use Data::Dumper ();
 	use File::Basename ();
 
 	# enum DeviceType => [ 'Alienware', 'Generic' ];

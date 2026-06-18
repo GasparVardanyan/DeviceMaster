@@ -45,6 +45,20 @@ package DeviceMaster::FeatureInterface {
 
 		return $self->value eq $value;
 	}
+
+	sub ensure {
+		my $self = shift;
+		my $value = shift;
+
+		$self->acquire;
+
+		if ($self->value ne $value) {
+			return $self->set ($value);
+		}
+		else {
+			return 1;
+		}
+	}
 }
 
 1;

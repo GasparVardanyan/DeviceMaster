@@ -50,7 +50,7 @@ package DeviceMaster::AppUtils::PacketProcessor {
 			elsif (
 				'DeviceSystem' eq $item->type || 'Device' eq $item->type
 			) {
-				$r = { response => ${$item->ref}->TO_JSON, success => 1 };
+				$r = { response => ${$item->ref}, success => 1 };
 			}
 			elsif ('HASH' eq $item->type) {
 				$r = { response => {
@@ -68,10 +68,23 @@ package DeviceMaster::AppUtils::PacketProcessor {
 		elsif ('Set' eq $cmd->type) {
 			if ('FeatureInterface' eq $item->type) {
 				if (${$item->ref}->set ($cmd->value)) {
-					$r = { response => ${$item->ref}->acquire, success => 1 };
+					$r = { response => ${$item->ref}->get, success => 1 };
 				}
 				else {
-					$r = { response => ${$item->ref}->acquire, success => 0, error => 'failed to set the value' };
+					$r = { response => ${$item->ref}->get, success => 0, error => 'failed to set the value' };
+				}
+			}
+			else {
+				$r = { response => '', success => 0, error => 'invalid feature requested to set a value' };
+			}
+		}
+		elsif ('Ensure' eq $cmd->type) {
+			if ('FeatureInterface' eq $item->type) {
+				if (${$item->ref}->ensure ($cmd->value)) {
+					$r = { response => ${$item->ref}->get, success => 1 };
+				}
+				else {
+					$r = { response => ${$item->ref}->get, success => 0, error => 'failed to set the value' };
 				}
 			}
 			else {

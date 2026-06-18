@@ -80,4 +80,20 @@ package DeviceMaster::AppUtils::Packet::Set {
 	__PACKAGE__->meta->make_immutable;
 };
 
+package DeviceMaster::AppUtils::Packet::Ensure {
+	use namespace::autoclean;
+	use Moo;
+
+	use DeviceMaster::AppUtils::Packet::Get;
+
+	extends 'DeviceMaster::AppUtils::Packet::Set';
+
+	has '+type' => (
+		init_arg => undef,
+		default => sub { 'Ensure' }
+	);
+
+	__PACKAGE__->meta->make_immutable;
+}
+
 1;

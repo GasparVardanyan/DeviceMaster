@@ -83,6 +83,20 @@ package DeviceMaster::AppUtils::JSONProcessor {
 						$r->{error} = 'Set request must have path and value';
 					}
 				}
+				elsif ('Ensure' eq $type) {
+					if (exists $j->{path} && exists $j->{value}) {
+						my $packet = DeviceMaster::AppUtils::Packet::Ensure->new (
+							path => $j->{path},
+							value => $j->{value},
+							return_path => $return_path
+						);
+
+						$r = ${$self->packet_processor}->process ($packet);
+					}
+					else {
+						$r->{error} = 'Ensure request must have path and value';
+					}
+				}
 				else {
 					$r->{error} = 'unsupported type of a command';
 				}

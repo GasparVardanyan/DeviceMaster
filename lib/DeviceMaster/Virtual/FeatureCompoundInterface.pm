@@ -88,6 +88,30 @@ package DeviceMaster::Virtual::FeatureCompoundInterface {
 		return List::Util::all { $_ eq 1 } values %{ $self->_write_status };
 	};
 
+	around ensure => sub {
+		my $orig = shift;
+		my $self = shift;
+		my $value = shift;
+
+		$self->acquire;
+
+		# FIXME: CRITICAL: make sure this works
+
+		my %_T = %{ $self->targets };
+
+		for my $fname (keys %_T) {
+			if ($self->value->{$fname} ne $value) {
+				$self->_write_status->{$fname} = ${$_T {$fname}}->set ($value);
+			}
+			else {
+				$self->_write_status->{$fname} = 1;
+			}
+			$self->value->{$fname} = ${$_T {$fname}}->get;
+		}
+
+		return List::Util::all { $_ eq 1 } values %{ $self->_write_status };
+	};
+
 	__PACKAGE__->meta->make_immutable;
 }
 
